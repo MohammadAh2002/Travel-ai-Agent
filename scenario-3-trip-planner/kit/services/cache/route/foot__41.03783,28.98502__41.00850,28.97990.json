@@ -1,0 +1,23 @@
+{
+ "kind": "route",
+ "profile": "foot",
+ "from": {
+  "name": "Istanbul Taksim Square",
+  "lat": 41.0378331,
+  "lon": 28.9850165,
+  "resolved_by": "nominatim",
+  "source_url": "https://nominatim.openstreetmap.org/search?q=Taksim+Square%2C+Istanbul&format=jsonv2&limit=1&accept-language=en"
+ },
+ "to": {
+  "name": "Hagia Sophia",
+  "id": "wv-istanbul-hagia-sophia",
+  "lat": 41.0085,
+  "lon": 28.9799,
+  "resolved_by": "wikivoyage listing",
+  "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See"
+ },
+ "distance_m": 4427.7,
+ "duration_s": 3544.6,
+ "retrieved_at": "2026-10-23T22:27:28Z",
+ "via": "OSRM route service"
+}

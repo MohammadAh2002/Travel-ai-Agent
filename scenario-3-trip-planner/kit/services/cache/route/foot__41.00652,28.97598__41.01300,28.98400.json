@@ -1,0 +1,23 @@
+{
+ "kind": "route",
+ "profile": "foot",
+ "from": {
+  "name": "Sultan Ahmed Square",
+  "lat": 41.0065157,
+  "lon": 28.9759773,
+  "resolved_by": "nominatim",
+  "source_url": "https://nominatim.openstreetmap.org/search?q=Sultanahmet+Square%2C+Istanbul&format=jsonv2&limit=1&accept-language=en"
+ },
+ "to": {
+  "name": "Topkapı Palace",
+  "id": "wv-istanbul-topkapi-palace",
+  "lat": 41.013,
+  "lon": 28.984,
+  "resolved_by": "wikivoyage listing",
+  "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See"
+ },
+ "distance_m": 1274.9,
+ "duration_s": 1019.9,
+ "retrieved_at": "2026-10-23T22:24:31Z",
+ "via": "OSRM route service"
+}

@@ -1,0 +1,23 @@
+{
+ "kind": "route",
+ "profile": "foot",
+ "from": {
+  "name": "Istanbul Taksim Square",
+  "lat": 41.0378331,
+  "lon": 28.9850165,
+  "resolved_by": "nominatim",
+  "source_url": "https://nominatim.openstreetmap.org/search?q=Taksim+Square%2C+Istanbul&format=jsonv2&limit=1&accept-language=en"
+ },
+ "to": {
+  "name": "Galata Tower",
+  "id": "wv-istanbul-galata-tower",
+  "lat": 41.025556,
+  "lon": 28.974167,
+  "resolved_by": "wikivoyage listing",
+  "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Galata#See"
+ },
+ "distance_m": 1906.5,
+ "duration_s": 1527.3,
+ "retrieved_at": "2026-10-23T22:27:27Z",
+ "via": "OSRM route service"
+}

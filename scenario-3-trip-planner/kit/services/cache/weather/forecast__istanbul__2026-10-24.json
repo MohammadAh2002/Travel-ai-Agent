@@ -1,0 +1,157 @@
+{
+ "kind": "forecast",
+ "city": "Istanbul",
+ "lat": 41.0064,
+ "lon": 28.9759,
+ "issued_for": "2026-10-24",
+ "days": [
+  {
+   "date": "2026-10-24",
+   "weather_code": 3,
+   "summary": "overcast",
+   "temp_max_c": 18.8,
+   "temp_min_c": 13.8,
+   "precip_probability_pct": 5,
+   "precip_mm": 0.0
+  },
+  {
+   "date": "2026-10-25",
+   "weather_code": 3,
+   "summary": "overcast",
+   "temp_max_c": 20.8,
+   "temp_min_c": 13.1,
+   "precip_probability_pct": 0,
+   "precip_mm": 0.0
+  },
+  {
+   "date": "2026-10-26",
+   "weather_code": 3,
+   "summary": "overcast",
+   "temp_max_c": 21.4,
+   "temp_min_c": 13.8,
+   "precip_probability_pct": 19,
+   "precip_mm": 0.0
+  },
+  {
+   "date": "2026-10-27",
+   "weather_code": 61,
+   "summary": "light rain",
+   "temp_max_c": 16.3,
+   "temp_min_c": 13.4,
+   "precip_probability_pct": 56,
+   "precip_mm": 14.3
+  },
+  {
+   "date": "2026-10-28",
+   "weather_code": 61,
+   "summary": "light rain",
+   "temp_max_c": 13.4,
+   "temp_min_c": 9.3,
+   "precip_probability_pct": 57,
+   "precip_mm": 10.7
+  },
+  {
+   "date": "2026-10-29",
+   "weather_code": 3,
+   "summary": "overcast",
+   "temp_max_c": 16.6,
+   "temp_min_c": 8.2,
+   "precip_probability_pct": 25,
+   "precip_mm": 0.0
+  },
+  {
+   "date": "2026-10-30",
+   "weather_code": 61,
+   "summary": "light rain",
+   "temp_max_c": 13.8,
+   "temp_min_c": 11.0,
+   "precip_probability_pct": 37,
+   "precip_mm": 1.8
+  },
+  {
+   "date": "2026-10-31",
+   "weather_code": 51,
+   "summary": "light drizzle",
+   "temp_max_c": 14.6,
+   "temp_min_c": 10.8,
+   "precip_probability_pct": 40,
+   "precip_mm": 1.95
+  },
+  {
+   "date": "2026-11-01",
+   "weather_code": 53,
+   "summary": "drizzle",
+   "temp_max_c": 16.2,
+   "temp_min_c": 10.1,
+   "precip_probability_pct": 39,
+   "precip_mm": 1.0
+  },
+  {
+   "date": "2026-11-02",
+   "weather_code": 53,
+   "summary": "drizzle",
+   "temp_max_c": 14.0,
+   "temp_min_c": 10.6,
+   "precip_probability_pct": 34,
+   "precip_mm": 5.4
+  },
+  {
+   "date": "2026-11-03",
+   "weather_code": 51,
+   "summary": "light drizzle",
+   "temp_max_c": 16.9,
+   "temp_min_c": 10.2,
+   "precip_probability_pct": 25,
+   "precip_mm": 0.8
+  },
+  {
+   "date": "2026-11-04",
+   "weather_code": 3,
+   "summary": "overcast",
+   "temp_max_c": 16.6,
+   "temp_min_c": 10.2,
+   "precip_probability_pct": 43,
+   "precip_mm": 0.0
+  },
+  {
+   "date": "2026-11-05",
+   "weather_code": 45,
+   "summary": "fog",
+   "temp_max_c": 15.6,
+   "temp_min_c": 9.6,
+   "precip_probability_pct": 31,
+   "precip_mm": 0.0
+  },
+  {
+   "date": "2026-11-06",
+   "weather_code": 2,
+   "summary": "partly cloudy",
+   "temp_max_c": 17.8,
+   "temp_min_c": 12.1,
+   "precip_probability_pct": 24,
+   "precip_mm": 0.0
+  },
+  {
+   "date": "2026-11-07",
+   "weather_code": 3,
+   "summary": "overcast",
+   "temp_max_c": 19.9,
+   "temp_min_c": 13.2,
+   "precip_probability_pct": 24,
+   "precip_mm": 0.0
+  },
+  {
+   "date": "2026-11-08",
+   "weather_code": null,
+   "summary": "unknown",
+   "temp_max_c": null,
+   "temp_min_c": null,
+   "precip_probability_pct": 31,
+   "precip_mm": null
+  }
+ ],
+ "source": "Open-Meteo forecast API",
+ "source_url": "https://api.open-meteo.com/v1/forecast?latitude=41.0064&longitude=28.9759&timezone=auto&forecast_days=16&daily=weather_code%2Ctemperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_probability_max%2Cprecipitation_sum",
+ "licence": "Weather data by Open-Meteo.com, CC BY 4.0",
+ "retrieved_at": "2026-10-23T22:22:36Z"
+}

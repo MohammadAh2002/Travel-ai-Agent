@@ -1,0 +1,23 @@
+{
+ "kind": "route",
+ "profile": "driving",
+ "from": {
+  "name": "Queen Alia International Airport",
+  "lat": 31.7238024,
+  "lon": 36.007237,
+  "resolved_by": "nominatim",
+  "source_url": "https://nominatim.openstreetmap.org/search?q=Queen+Alia+International+Airport%2C+Amman&format=jsonv2&limit=1&accept-language=en"
+ },
+ "to": {
+  "name": "Amman Citadel",
+  "id": "wv-amman-amman-citadel",
+  "lat": 31.9547,
+  "lon": 35.9343,
+  "resolved_by": "wikivoyage listing",
+  "source_url": "https://en.wikivoyage.org/wiki/Amman#See"
+ },
+ "distance_m": 36023,
+ "duration_s": 2817.9,
+ "retrieved_at": "2026-10-23T22:24:39Z",
+ "via": "OSRM route service"
+}

@@ -1,0 +1,49 @@
+{
+ "kind": "wikivoyage_page",
+ "title": "Istanbul",
+ "requested_title": "Istanbul",
+ "source": "Wikivoyage",
+ "source_url": "https://en.wikivoyage.org/wiki/Istanbul",
+ "licence": "Text from Wikivoyage, CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)",
+ "retrieved_at": "2026-10-23T21:49:52Z",
+ "revid": null,
+ "districts": [
+  "Istanbul/Historical Peninsula",
+  "Istanbul/Galata",
+  "Istanbul/European Bosphorus",
+  "Istanbul/Golden Horn",
+  "Istanbul/New City",
+  "Istanbul/Western Suburbs",
+  "Istanbul/Rural",
+  "Istanbul/Asian Bosphorus",
+  "Istanbul/Kadikoy",
+  "Istanbul/Princes' Islands",
+  "Istanbul/Eastern Suburbs",
+  "Istanbul/Sile"
+ ],
+ "listings": [
+  {
+   "id": "wv-istanbul-megapass-istanbul",
+   "kind": "see",
+   "name": "MegaPass Istanbul",
+   "alt": null,
+   "district": null,
+   "section": "Do / City passes",
+   "price_tier": null,
+   "address": "Gumussuyu, İnonu Cd. No 11",
+   "lat": null,
+   "lon": null,
+   "url": "https://megapass.com/turkey/istanbul/pass",
+   "hours_raw": null,
+   "price_raw": "€116–€284, depending on the pass",
+   "last_edit": "2025-01-17",
+   "wikidata": null,
+   "description": "MegaPass Istanbul offers several city pass options combining Bosphorus cruises, guided tours, and access to key attractions. Travelers can choose from: Classic City Pass: Includes a Bosphorus cruise, guided Blue Mosque tour, transportation card with 5 rides, and access to two attractions. Premium City Pass: Adds a hop-on hop-off bus tour, a Turkish bath experience, and access to four attractions. Deluxe City Pass: Includes a dinner cruise, whirling dervish ceremony, and access to all listed attractions. The city passes are valid for 7 days from first use.",
+   "tags": [
+    "religious"
+   ],
+   "dietary_mentions": [],
+   "source_url": "https://en.wikivoyage.org/wiki/Istanbul#Do"
+  }
+ ]
+}

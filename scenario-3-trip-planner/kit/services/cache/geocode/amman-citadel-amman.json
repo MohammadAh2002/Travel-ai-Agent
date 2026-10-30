@@ -1,0 +1,16 @@
+{
+ "kind": "geocode",
+ "query": "Amman Citadel, Amman",
+ "name": "Amman Citadel",
+ "display_name": "Amman Citadel, Al Mathaf Street, Downtown, منطقة المدينة, Amman, Amman Sub-District, Amman Qasabah District, Amman, 11110, Jordan",
+ "lat": 31.9544825,
+ "lon": 35.936707,
+ "osm_type": "node",
+ "osm_id": 6173897738,
+ "category": "information",
+ "type": "map",
+ "source": "Nominatim (OpenStreetMap)",
+ "source_url": "https://nominatim.openstreetmap.org/search?q=Amman+Citadel%2C+Amman&format=jsonv2&limit=1&accept-language=en",
+ "licence": "Data (c) OpenStreetMap contributors, ODbL (https://www.openstreetmap.org/copyright)",
+ "retrieved_at": "2026-10-23T22:22:33Z"
+}

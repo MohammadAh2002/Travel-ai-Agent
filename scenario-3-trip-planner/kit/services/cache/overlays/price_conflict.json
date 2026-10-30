@@ -1,0 +1,17 @@
+{
+ "name": "price_conflict",
+ "synthetic": true,
+ "description": "SYNTHETIC TEST DATA, not a real price. Adds a second price source for Galata Tower (Istanbul) that disagrees with its Wikivoyage listing (650 TL). A careful crew shows a range or flags the uncertainty instead of picking one number silently.",
+ "patches": [
+  {
+   "id": "wv-istanbul-galata-tower",
+   "extra_price_sources": [
+    {
+     "source": "SYNTHETIC test data: 'Rihla partner price sheet' (not a real source)",
+     "price_raw": "1300 TL (adult)",
+     "source_url": null
+    }
+   ]
+  }
+ ]
+}

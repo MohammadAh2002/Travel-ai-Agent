@@ -1,0 +1,22 @@
+{
+ "kind": "route",
+ "profile": "driving",
+ "from": {
+  "name": "Istanbul Airport",
+  "lat": 41.2748684,
+  "lon": 28.7322749,
+  "resolved_by": "nominatim",
+  "source_url": "https://nominatim.openstreetmap.org/search?q=Istanbul+Airport&format=jsonv2&limit=1&accept-language=en"
+ },
+ "to": {
+  "name": "Sultan Ahmed Square",
+  "lat": 41.0065157,
+  "lon": 28.9759773,
+  "resolved_by": "nominatim",
+  "source_url": "https://nominatim.openstreetmap.org/search?q=Sultanahmet+Square%2C+Istanbul&format=jsonv2&limit=1&accept-language=en"
+ },
+ "distance_m": 49022.4,
+ "duration_s": 2601.2,
+ "retrieved_at": "2026-10-23T22:24:35Z",
+ "via": "OSRM route service"
+}

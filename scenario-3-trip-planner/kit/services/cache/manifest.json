@@ -1,0 +1,377 @@
+{
+ "about": "Replay cache of the Rihla travel gateway: real open data, recorded once. See the kit README for licences.",
+ "recorded_today": "2026-10-24",
+ "forecast_window": [
+  "2026-10-24",
+  "2026-11-08"
+ ],
+ "seasonal_normals_from_archive": [
+  "2025-11-09",
+  "2026-10-15"
+ ],
+ "cities": [
+  {
+   "name": "Istanbul",
+   "wikivoyage_pages": 13,
+   "attractions": 212,
+   "attractions_with_hours": 97,
+   "attractions_with_price": 77,
+   "restaurants": 71,
+   "cafes_and_bars": 21,
+   "with_coordinates": 229
+  },
+  {
+   "name": "Amman",
+   "wikivoyage_pages": 1,
+   "attractions": 23,
+   "attractions_with_hours": 5,
+   "attractions_with_price": 8,
+   "restaurants": 16,
+   "cafes_and_bars": 5,
+   "with_coordinates": 31
+  }
+ ],
+ "licences": {
+  "wikivoyage": "Text from Wikivoyage, CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/)",
+  "openstreetmap": "Data (c) OpenStreetMap contributors, ODbL (https://www.openstreetmap.org/copyright)",
+  "open_meteo": "Weather data by Open-Meteo.com, CC BY 4.0",
+  "frankfurter": "Euro foreign exchange reference rates of the European Central Bank, via Frankfurter"
+ },
+ "overlays": {
+  "price_conflict": "SYNTHETIC test data",
+  "prompt_injection": "SYNTHETIC test data"
+ },
+ "files": [
+  {
+   "file": "fx/latest__EUR.json",
+   "bytes": 853,
+   "retrieved_at": "2026-10-23T22:22:37Z",
+   "synthetic": false
+  },
+  {
+   "file": "geocode/abdali-boulevard-amman.json",
+   "bytes": 664,
+   "retrieved_at": "2026-10-23T22:22:30Z",
+   "synthetic": false
+  },
+  {
+   "file": "geocode/amman-citadel-amman.json",
+   "bytes": 693,
+   "retrieved_at": "2026-10-23T22:22:33Z",
+   "synthetic": false
+  },
+  {
+   "file": "geocode/amman.json",
+   "bytes": 579,
+   "retrieved_at": "2026-10-23T22:22:19Z",
+   "synthetic": false
+  },
+  {
+   "file": "geocode/eminonu-istanbul.json",
+   "bytes": 681,
+   "retrieved_at": "2026-10-23T22:22:23Z",
+   "synthetic": false
+  },
+  {
+   "file": "geocode/galata-tower-istanbul.json",
+   "bytes": 672,
+   "retrieved_at": "2026-10-23T22:22:27Z",
+   "synthetic": false
+  },
+  {
+   "file": "geocode/grand-bazaar-istanbul.json",
+   "bytes": 648,
+   "retrieved_at": "2026-10-23T22:22:29Z",
+   "synthetic": false
+  },
+  {
+   "file": "geocode/hagia-sophia-istanbul.json",
+   "bytes": 678,
+   "retrieved_at": "2026-10-23T22:22:25Z",
+   "synthetic": false
+  },
+  {
+   "file": "geocode/istanbul-airport.json",
+   "bytes": 636,
+   "retrieved_at": "2026-10-23T22:22:22Z",
+   "synthetic": false
+  },
+  {
+   "file": "geocode/istanbul.json",
+   "bytes": 572,
+   "retrieved_at": "2026-10-23T22:22:18Z",
+   "synthetic": false
+  },
+  {
+   "file": "geocode/kadikoy-istanbul.json",
+   "bytes": 607,
+   "retrieved_at": "2026-10-23T22:22:24Z",
+   "synthetic": false
+  },
+  {
+   "file": "geocode/queen-alia-international-airport-amman.json",
+   "bytes": 734,
+   "retrieved_at": "2026-10-23T22:24:38Z",
+   "synthetic": false
+  },
+  {
+   "file": "geocode/queen-alia-international-airport.json",
+   "bytes": 718,
+   "retrieved_at": "2026-10-23T22:22:32Z",
+   "synthetic": false
+  },
+  {
+   "file": "geocode/rainbow-street-amman.json",
+   "bytes": 682,
+   "retrieved_at": "2026-10-23T22:22:31Z",
+   "synthetic": false
+  },
+  {
+   "file": "geocode/roman-theatre-amman.json",
+   "bytes": 691,
+   "retrieved_at": "2026-10-23T22:22:35Z",
+   "synthetic": false
+  },
+  {
+   "file": "geocode/sultanahmet-square-istanbul.json",
+   "bytes": 668,
+   "retrieved_at": "2026-10-23T22:22:21Z",
+   "synthetic": false
+  },
+  {
+   "file": "geocode/taksim-square-istanbul.json",
+   "bytes": 684,
+   "retrieved_at": "2026-10-23T22:22:20Z",
+   "synthetic": false
+  },
+  {
+   "file": "geocode/topkapi-palace-istanbul.json",
+   "bytes": 695,
+   "retrieved_at": "2026-10-23T22:22:27Z",
+   "synthetic": false
+  },
+  {
+   "file": "overlays/price_conflict.json",
+   "bytes": 583,
+   "retrieved_at": null,
+   "synthetic": true
+  },
+  {
+   "file": "overlays/prompt_injection.json",
+   "bytes": 1296,
+   "retrieved_at": null,
+   "synthetic": true
+  },
+  {
+   "file": "route/driving__31.72380,36.00724__31.95470,35.93430.json",
+   "bytes": 667,
+   "retrieved_at": "2026-10-23T22:24:39Z",
+   "synthetic": false
+  },
+  {
+   "file": "route/driving__41.03783,28.98502__41.00652,28.97598.json",
+   "bytes": 686,
+   "retrieved_at": "2026-10-23T22:27:31Z",
+   "synthetic": false
+  },
+  {
+   "file": "route/driving__41.27487,28.73227__41.00652,28.97598.json",
+   "bytes": 673,
+   "retrieved_at": "2026-10-23T22:24:35Z",
+   "synthetic": false
+  },
+  {
+   "file": "route/foot__31.96424,35.90665__31.95169,35.93930.json",
+   "bytes": 638,
+   "retrieved_at": "2026-10-23T22:24:38Z",
+   "synthetic": false
+  },
+  {
+   "file": "route/foot__31.96424,35.90665__31.95470,35.93430.json",
+   "bytes": 630,
+   "retrieved_at": "2026-10-23T22:24:37Z",
+   "synthetic": false
+  },
+  {
+   "file": "route/foot__41.00652,28.97598__41.00810,28.97780.json",
+   "bytes": 673,
+   "retrieved_at": "2026-10-23T22:24:32Z",
+   "synthetic": false
+  },
+  {
+   "file": "route/foot__41.00652,28.97598__41.00850,28.97990.json",
+   "bytes": 663,
+   "retrieved_at": "2026-10-23T22:24:30Z",
+   "synthetic": false
+  },
+  {
+   "file": "route/foot__41.00652,28.97598__41.01060,28.96850.json",
+   "bytes": 666,
+   "retrieved_at": "2026-10-23T22:27:30Z",
+   "synthetic": false
+  },
+  {
+   "file": "route/foot__41.00652,28.97598__41.01300,28.98400.json",
+   "bytes": 670,
+   "retrieved_at": "2026-10-23T22:24:31Z",
+   "synthetic": false
+  },
+  {
+   "file": "route/foot__41.01829,28.97002__41.02556,28.97417.json",
+   "bytes": 645,
+   "retrieved_at": "2026-10-23T22:24:34Z",
+   "synthetic": false
+  },
+  {
+   "file": "route/foot__41.03783,28.98502__41.00850,28.97990.json",
+   "bytes": 665,
+   "retrieved_at": "2026-10-23T22:27:28Z",
+   "synthetic": false
+  },
+  {
+   "file": "route/foot__41.03783,28.98502__41.02556,28.97417.json",
+   "bytes": 655,
+   "retrieved_at": "2026-10-23T22:27:27Z",
+   "synthetic": false
+  },
+  {
+   "file": "route/foot__41.03783,28.98502__41.03944,29.00167.json",
+   "bytes": 677,
+   "retrieved_at": "2026-10-23T22:27:29Z",
+   "synthetic": false
+  },
+  {
+   "file": "route/table__amman__driving.json",
+   "bytes": 23500,
+   "retrieved_at": "2026-10-23T22:27:19Z",
+   "synthetic": false
+  },
+  {
+   "file": "route/table__amman__foot.json",
+   "bytes": 24170,
+   "retrieved_at": "2026-10-23T22:27:09Z",
+   "synthetic": false
+  },
+  {
+   "file": "route/table__istanbul__driving.json",
+   "bytes": 270258,
+   "retrieved_at": "2026-10-23T22:27:00Z",
+   "synthetic": false
+  },
+  {
+   "file": "route/table__istanbul__foot.json",
+   "bytes": 279766,
+   "retrieved_at": "2026-10-23T22:26:40Z",
+   "synthetic": false
+  },
+  {
+   "file": "weather/archive__amman__2025-11-09__2026-10-15.json",
+   "bytes": 54135,
+   "retrieved_at": "2026-10-23T22:23:00Z",
+   "synthetic": false
+  },
+  {
+   "file": "weather/archive__istanbul__2025-11-09__2026-10-15.json",
+   "bytes": 54366,
+   "retrieved_at": "2026-10-23T22:23:00Z",
+   "synthetic": false
+  },
+  {
+   "file": "weather/forecast__amman__2026-10-24.json",
+   "bytes": 3561,
+   "retrieved_at": "2026-10-23T22:22:36Z",
+   "synthetic": false
+  },
+  {
+   "file": "weather/forecast__istanbul__2026-10-24.json",
+   "bytes": 3568,
+   "retrieved_at": "2026-10-23T22:22:36Z",
+   "synthetic": false
+  },
+  {
+   "file": "wikivoyage/amman.json",
+   "bytes": 32848,
+   "retrieved_at": "2026-10-23T21:49:53Z",
+   "synthetic": false
+  },
+  {
+   "file": "wikivoyage/istanbul-asian-bosphorus.json",
+   "bytes": 25471,
+   "retrieved_at": "2026-10-23T22:26:26Z",
+   "synthetic": false
+  },
+  {
+   "file": "wikivoyage/istanbul-eastern-suburbs.json",
+   "bytes": 13654,
+   "retrieved_at": "2026-10-23T22:26:27Z",
+   "synthetic": false
+  },
+  {
+   "file": "wikivoyage/istanbul-european-bosphorus.json",
+   "bytes": 25485,
+   "retrieved_at": "2026-10-23T21:50:16Z",
+   "synthetic": false
+  },
+  {
+   "file": "wikivoyage/istanbul-galata.json",
+   "bytes": 43785,
+   "retrieved_at": "2026-10-23T21:50:13Z",
+   "synthetic": false
+  },
+  {
+   "file": "wikivoyage/istanbul-golden-horn.json",
+   "bytes": 11333,
+   "retrieved_at": "2026-10-23T21:50:17Z",
+   "synthetic": false
+  },
+  {
+   "file": "wikivoyage/istanbul-historical-peninsula.json",
+   "bytes": 55204,
+   "retrieved_at": "2026-10-23T21:50:11Z",
+   "synthetic": false
+  },
+  {
+   "file": "wikivoyage/istanbul-kadikoy.json",
+   "bytes": 14936,
+   "retrieved_at": "2026-10-23T21:50:19Z",
+   "synthetic": false
+  },
+  {
+   "file": "wikivoyage/istanbul-new-city.json",
+   "bytes": 15251,
+   "retrieved_at": "2026-10-23T21:50:14Z",
+   "synthetic": false
+  },
+  {
+   "file": "wikivoyage/istanbul-princes-islands.json",
+   "bytes": 10719,
+   "retrieved_at": "2026-10-23T22:26:27Z",
+   "synthetic": false
+  },
+  {
+   "file": "wikivoyage/istanbul-rural.json",
+   "bytes": 15267,
+   "retrieved_at": "2026-10-23T22:26:26Z",
+   "synthetic": false
+  },
+  {
+   "file": "wikivoyage/istanbul-sile.json",
+   "bytes": 8475,
+   "retrieved_at": "2026-10-23T22:26:28Z",
+   "synthetic": false
+  },
+  {
+   "file": "wikivoyage/istanbul-western-suburbs.json",
+   "bytes": 20861,
+   "retrieved_at": "2026-10-23T22:26:25Z",
+   "synthetic": false
+  },
+  {
+   "file": "wikivoyage/istanbul.json",
+   "bytes": 1894,
+   "retrieved_at": "2026-10-23T21:49:52Z",
+   "synthetic": false
+  }
+ ],
+ "total_bytes": 1031149
+}

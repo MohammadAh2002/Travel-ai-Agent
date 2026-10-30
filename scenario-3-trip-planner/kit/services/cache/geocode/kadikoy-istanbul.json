@@ -1,0 +1,16 @@
+{
+ "kind": "geocode",
+ "query": "Kadıköy, Istanbul",
+ "name": "Kadıköy",
+ "display_name": "Kadıköy, Istanbul, Marmara Region, Turkey",
+ "lat": 40.9912955,
+ "lon": 29.0245631,
+ "osm_type": "relation",
+ "osm_id": 1276548,
+ "category": "boundary",
+ "type": "administrative",
+ "source": "Nominatim (OpenStreetMap)",
+ "source_url": "https://nominatim.openstreetmap.org/search?q=Kad%C4%B1k%C3%B6y%2C+Istanbul&format=jsonv2&limit=1&accept-language=en",
+ "licence": "Data (c) OpenStreetMap contributors, ODbL (https://www.openstreetmap.org/copyright)",
+ "retrieved_at": "2026-10-23T22:22:24Z"
+}

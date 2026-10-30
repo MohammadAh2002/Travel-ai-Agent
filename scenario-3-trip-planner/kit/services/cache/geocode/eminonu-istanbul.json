@@ -1,0 +1,16 @@
+{
+ "kind": "geocode",
+ "query": "Eminönü, Istanbul",
+ "name": "Eminönü",
+ "display_name": "Eminönü, Kızılhan Sokağı, Eminönü, Rüstempaşa Mahallesi, Istanbul, Fatih, Istanbul, Marmara Region, 34116, Turkey",
+ "lat": 41.0182861,
+ "lon": 28.9700158,
+ "osm_type": "node",
+ "osm_id": 11157685025,
+ "category": "railway",
+ "type": "tram_stop",
+ "source": "Nominatim (OpenStreetMap)",
+ "source_url": "https://nominatim.openstreetmap.org/search?q=Emin%C3%B6n%C3%BC%2C+Istanbul&format=jsonv2&limit=1&accept-language=en",
+ "licence": "Data (c) OpenStreetMap contributors, ODbL (https://www.openstreetmap.org/copyright)",
+ "retrieved_at": "2026-10-23T22:22:23Z"
+}

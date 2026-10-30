@@ -1,0 +1,16 @@
+{
+ "kind": "geocode",
+ "query": "Amman",
+ "name": "Amman",
+ "display_name": "Amman, Amman Sub-District, Amman Qasabah District, Amman, 11110, Jordan",
+ "lat": 31.9515694,
+ "lon": 35.9239625,
+ "osm_type": "node",
+ "osm_id": 1643504896,
+ "category": "place",
+ "type": "city",
+ "source": "Nominatim (OpenStreetMap)",
+ "source_url": "https://nominatim.openstreetmap.org/search?q=Amman&format=jsonv2&limit=1&accept-language=en",
+ "licence": "Data (c) OpenStreetMap contributors, ODbL (https://www.openstreetmap.org/copyright)",
+ "retrieved_at": "2026-10-23T22:22:19Z"
+}

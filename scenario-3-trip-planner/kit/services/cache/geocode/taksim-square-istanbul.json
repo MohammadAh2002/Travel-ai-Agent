@@ -1,0 +1,16 @@
+{
+ "kind": "geocode",
+ "query": "Taksim Square, Istanbul",
+ "name": "Istanbul Taksim Square",
+ "display_name": "Istanbul Taksim Square, Taksim, Gümüşsuyu, Gümüşsuyu Mahallesi, Beyoğlu, Istanbul, Marmara Region, Turkey",
+ "lat": 41.0378331,
+ "lon": 28.9850165,
+ "osm_type": "relation",
+ "osm_id": 4473230,
+ "category": "highway",
+ "type": "pedestrian",
+ "source": "Nominatim (OpenStreetMap)",
+ "source_url": "https://nominatim.openstreetmap.org/search?q=Taksim+Square%2C+Istanbul&format=jsonv2&limit=1&accept-language=en",
+ "licence": "Data (c) OpenStreetMap contributors, ODbL (https://www.openstreetmap.org/copyright)",
+ "retrieved_at": "2026-10-23T22:22:20Z"
+}

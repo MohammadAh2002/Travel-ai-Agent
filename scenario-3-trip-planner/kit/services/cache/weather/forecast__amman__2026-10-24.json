@@ -1,0 +1,157 @@
+{
+ "kind": "forecast",
+ "city": "Amman",
+ "lat": 31.9516,
+ "lon": 35.924,
+ "issued_for": "2026-10-24",
+ "days": [
+  {
+   "date": "2026-10-24",
+   "weather_code": 3,
+   "summary": "overcast",
+   "temp_max_c": 28.7,
+   "temp_min_c": 19.3,
+   "precip_probability_pct": 3,
+   "precip_mm": 0.1
+  },
+  {
+   "date": "2026-10-25",
+   "weather_code": 3,
+   "summary": "overcast",
+   "temp_max_c": 28.1,
+   "temp_min_c": 18.0,
+   "precip_probability_pct": 13,
+   "precip_mm": 0.1
+  },
+  {
+   "date": "2026-10-26",
+   "weather_code": 3,
+   "summary": "overcast",
+   "temp_max_c": 29.2,
+   "temp_min_c": 17.2,
+   "precip_probability_pct": 5,
+   "precip_mm": 0.0
+  },
+  {
+   "date": "2026-10-27",
+   "weather_code": 95,
+   "summary": "thunderstorm",
+   "temp_max_c": 24.5,
+   "temp_min_c": 17.3,
+   "precip_probability_pct": 30,
+   "precip_mm": 2.9
+  },
+  {
+   "date": "2026-10-28",
+   "weather_code": 80,
+   "summary": "light showers",
+   "temp_max_c": 21.9,
+   "temp_min_c": 15.8,
+   "precip_probability_pct": 28,
+   "precip_mm": 1.1
+  },
+  {
+   "date": "2026-10-29",
+   "weather_code": 3,
+   "summary": "overcast",
+   "temp_max_c": 17.7,
+   "temp_min_c": 13.9,
+   "precip_probability_pct": 17,
+   "precip_mm": 0.0
+  },
+  {
+   "date": "2026-10-30",
+   "weather_code": 45,
+   "summary": "fog",
+   "temp_max_c": 17.5,
+   "temp_min_c": 12.8,
+   "precip_probability_pct": 16,
+   "precip_mm": 0.0
+  },
+  {
+   "date": "2026-10-31",
+   "weather_code": 51,
+   "summary": "light drizzle",
+   "temp_max_c": 20.6,
+   "temp_min_c": 11.0,
+   "precip_probability_pct": 6,
+   "precip_mm": 0.2
+  },
+  {
+   "date": "2026-11-01",
+   "weather_code": 51,
+   "summary": "light drizzle",
+   "temp_max_c": 19.9,
+   "temp_min_c": 12.2,
+   "precip_probability_pct": 10,
+   "precip_mm": 1.0
+  },
+  {
+   "date": "2026-11-02",
+   "weather_code": 1,
+   "summary": "mainly clear",
+   "temp_max_c": 18.6,
+   "temp_min_c": 11.6,
+   "precip_probability_pct": 18,
+   "precip_mm": 0.0
+  },
+  {
+   "date": "2026-11-03",
+   "weather_code": 3,
+   "summary": "overcast",
+   "temp_max_c": 18.7,
+   "temp_min_c": 11.1,
+   "precip_probability_pct": 22,
+   "precip_mm": 0.0
+  },
+  {
+   "date": "2026-11-04",
+   "weather_code": 3,
+   "summary": "overcast",
+   "temp_max_c": 19.4,
+   "temp_min_c": 10.2,
+   "precip_probability_pct": 20,
+   "precip_mm": 0.0
+  },
+  {
+   "date": "2026-11-05",
+   "weather_code": 3,
+   "summary": "overcast",
+   "temp_max_c": 18.4,
+   "temp_min_c": 11.1,
+   "precip_probability_pct": 18,
+   "precip_mm": 0.0
+  },
+  {
+   "date": "2026-11-06",
+   "weather_code": 3,
+   "summary": "overcast",
+   "temp_max_c": 20.8,
+   "temp_min_c": 9.8,
+   "precip_probability_pct": 22,
+   "precip_mm": 0.0
+  },
+  {
+   "date": "2026-11-07",
+   "weather_code": 0,
+   "summary": "clear sky",
+   "temp_max_c": 20.7,
+   "temp_min_c": 11.4,
+   "precip_probability_pct": 8,
+   "precip_mm": 0.0
+  },
+  {
+   "date": "2026-11-08",
+   "weather_code": null,
+   "summary": "unknown",
+   "temp_max_c": null,
+   "temp_min_c": null,
+   "precip_probability_pct": 8,
+   "precip_mm": null
+  }
+ ],
+ "source": "Open-Meteo forecast API",
+ "source_url": "https://api.open-meteo.com/v1/forecast?latitude=31.9516&longitude=35.924&timezone=auto&forecast_days=16&daily=weather_code%2Ctemperature_2m_max%2Ctemperature_2m_min%2Cprecipitation_probability_max%2Cprecipitation_sum",
+ "licence": "Weather data by Open-Meteo.com, CC BY 4.0",
+ "retrieved_at": "2026-10-23T22:22:36Z"
+}

@@ -1,0 +1,34 @@
+[
+  {
+    "traveller_id": "TRV-101",
+    "name": "Sara Nasser",
+    "fictional": true,
+    "preferences": {
+      "budget_style": "budget",
+      "interests": ["history", "local food"],
+      "dietary": ["vegetarian"],
+      "walking_tolerance": "high",
+      "max_walk_minutes": 25,
+      "home_currency": "USD",
+      "travel_party": "1 adult",
+      "notes": "Likes museums in the morning; prefers to be back at the hotel by 21:00."
+    },
+    "updated_at": "2026-10-01T09:00:00Z"
+  },
+  {
+    "traveller_id": "TRV-102",
+    "name": "Omar Khalil",
+    "fictional": true,
+    "preferences": {
+      "budget_style": "mid-range",
+      "interests": ["museums", "parks"],
+      "dietary": ["halal", "nut allergy"],
+      "walking_tolerance": "low",
+      "max_walk_minutes": 15,
+      "home_currency": "JOD",
+      "travel_party": "2 adults and 1 child (age 7)",
+      "notes": "Needs a rest after lunch when travelling with the child."
+    },
+    "updated_at": "2026-10-01T09:00:00Z"
+  }
+]

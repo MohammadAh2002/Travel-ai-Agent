@@ -1,0 +1,22 @@
+{
+ "kind": "route",
+ "profile": "driving",
+ "from": {
+  "name": "Istanbul Taksim Square",
+  "lat": 41.0378331,
+  "lon": 28.9850165,
+  "resolved_by": "nominatim",
+  "source_url": "https://nominatim.openstreetmap.org/search?q=Taksim+Square%2C+Istanbul&format=jsonv2&limit=1&accept-language=en"
+ },
+ "to": {
+  "name": "Sultan Ahmed Square",
+  "lat": 41.0065157,
+  "lon": 28.9759773,
+  "resolved_by": "nominatim",
+  "source_url": "https://nominatim.openstreetmap.org/search?q=Sultanahmet+Square%2C+Istanbul&format=jsonv2&limit=1&accept-language=en"
+ },
+ "distance_m": 5603.6,
+ "duration_s": 533.8,
+ "retrieved_at": "2026-10-23T22:27:31Z",
+ "via": "OSRM route service"
+}

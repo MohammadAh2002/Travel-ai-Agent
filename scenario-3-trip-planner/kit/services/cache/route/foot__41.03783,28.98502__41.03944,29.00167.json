@@ -1,0 +1,23 @@
+{
+ "kind": "route",
+ "profile": "foot",
+ "from": {
+  "name": "Istanbul Taksim Square",
+  "lat": 41.0378331,
+  "lon": 28.9850165,
+  "resolved_by": "nominatim",
+  "source_url": "https://nominatim.openstreetmap.org/search?q=Taksim+Square%2C+Istanbul&format=jsonv2&limit=1&accept-language=en"
+ },
+ "to": {
+  "name": "Dolmabahce Palace",
+  "id": "wv-istanbul-dolmabahce-palace",
+  "lat": 41.039444,
+  "lon": 29.001667,
+  "resolved_by": "wikivoyage listing",
+  "source_url": "https://en.wikivoyage.org/wiki/Istanbul/European_Bosphorus#See"
+ },
+ "distance_m": 1858.2,
+ "duration_s": 1488.2,
+ "retrieved_at": "2026-10-23T22:27:29Z",
+ "via": "OSRM route service"
+}

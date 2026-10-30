@@ -1,0 +1,44 @@
+[
+  {
+    "destination": "United States",
+    "source_name": "U.S. Department of State — Tourism and Visit Visas",
+    "url": "https://travel.state.gov/content/travel/en/us-visas/tourism-visit.html",
+    "authority": "U.S. Department of State",
+    "note": "Official U.S. government travel information; entry rules depend on passport nationality."
+  },
+  {
+    "destination": "United Kingdom",
+    "source_name": "UK Government — Check if you need a UK visa",
+    "url": "https://www.gov.uk/check-uk-visa",
+    "authority": "GOV.UK",
+    "note": "Official UK government visa checker; the traveller's passport nationality and purpose matter."
+  },
+  {
+    "destination": "France",
+    "source_name": "France-Visas — Official visa website",
+    "url": "https://france-visas.gouv.fr/",
+    "authority": "French Ministry for Europe and Foreign Affairs",
+    "note": "Official visa portal; requirements depend on nationality, trip purpose and length."
+  },
+  {
+    "destination": "Schengen Area",
+    "source_name": "European Commission — Immigration and visas",
+    "url": "https://home-affairs.ec.europa.eu/policies/migration-and-asylum/visa-policy_en",
+    "authority": "European Commission",
+    "note": "Official European Commission visa-policy information; confirm country-specific details."
+  },
+  {
+    "destination": "Turkey",
+    "source_name": "Republic of Türkiye — e-Visa",
+    "url": "https://www.evisa.gov.tr/en/",
+    "authority": "Republic of Türkiye",
+    "note": "Official Turkish e-Visa portal; eligibility depends on passport and travel details."
+  },
+  {
+    "destination": "Jordan",
+    "source_name": "Jordan Ministry of Interior — E-services",
+    "url": "https://eservices.moi.gov.jo/MOI_EVISA/",
+    "authority": "Jordan Ministry of Interior",
+    "note": "Official ministry portal; if the relevant requirement is unclear, contact the Jordanian embassy."
+  }
+]

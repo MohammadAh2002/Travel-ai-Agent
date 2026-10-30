@@ -1,0 +1,23 @@
+{
+ "kind": "route",
+ "profile": "foot",
+ "from": {
+  "name": "Abdali Boulevard",
+  "lat": 31.9642364,
+  "lon": 35.9066542,
+  "resolved_by": "nominatim",
+  "source_url": "https://nominatim.openstreetmap.org/search?q=Abdali+Boulevard%2C+Amman&format=jsonv2&limit=1&accept-language=en"
+ },
+ "to": {
+  "name": "Roman Theater",
+  "id": "wv-amman-roman-theater",
+  "lat": 31.951693,
+  "lon": 35.939305,
+  "resolved_by": "wikivoyage listing",
+  "source_url": "https://en.wikivoyage.org/wiki/Amman#See"
+ },
+ "distance_m": 4133.9,
+ "duration_s": 3306.6,
+ "retrieved_at": "2026-10-23T22:24:38Z",
+ "via": "OSRM route service"
+}

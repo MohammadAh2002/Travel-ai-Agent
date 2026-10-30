@@ -1,0 +1,16 @@
+{
+ "kind": "geocode",
+ "query": "Hagia Sophia, Istanbul",
+ "name": "Hagia Sophia",
+ "display_name": "Hagia Sophia, 1, Ayasofya Meydanı, Cankurtaran Mahallesi, Istanbul, Fatih, Istanbul, Marmara Region, 34122, Turkey",
+ "lat": 41.0085046,
+ "lon": 28.9800112,
+ "osm_type": "way",
+ "osm_id": 109862851,
+ "category": "amenity",
+ "type": "place_of_worship",
+ "source": "Nominatim (OpenStreetMap)",
+ "source_url": "https://nominatim.openstreetmap.org/search?q=Hagia+Sophia%2C+Istanbul&format=jsonv2&limit=1&accept-language=en",
+ "licence": "Data (c) OpenStreetMap contributors, ODbL (https://www.openstreetmap.org/copyright)",
+ "retrieved_at": "2026-10-23T22:22:25Z"
+}

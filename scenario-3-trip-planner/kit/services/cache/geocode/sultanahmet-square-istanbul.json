@@ -1,0 +1,16 @@
+{
+ "kind": "geocode",
+ "query": "Sultanahmet Square, Istanbul",
+ "name": "Sultan Ahmed Square",
+ "display_name": "Sultan Ahmed Square, Binbirdirek Mahallesi, Istanbul, Fatih, Istanbul, Marmara Region, Turkey",
+ "lat": 41.0065157,
+ "lon": 28.9759773,
+ "osm_type": "way",
+ "osm_id": 25512790,
+ "category": "highway",
+ "type": "pedestrian",
+ "source": "Nominatim (OpenStreetMap)",
+ "source_url": "https://nominatim.openstreetmap.org/search?q=Sultanahmet+Square%2C+Istanbul&format=jsonv2&limit=1&accept-language=en",
+ "licence": "Data (c) OpenStreetMap contributors, ODbL (https://www.openstreetmap.org/copyright)",
+ "retrieved_at": "2026-10-23T22:22:21Z"
+}

@@ -1,0 +1,23 @@
+{
+ "kind": "route",
+ "profile": "foot",
+ "from": {
+  "name": "Eminönü",
+  "lat": 41.0182861,
+  "lon": 28.9700158,
+  "resolved_by": "nominatim",
+  "source_url": "https://nominatim.openstreetmap.org/search?q=Emin%C3%B6n%C3%BC%2C+Istanbul&format=jsonv2&limit=1&accept-language=en"
+ },
+ "to": {
+  "name": "Galata Tower",
+  "id": "wv-istanbul-galata-tower",
+  "lat": 41.025556,
+  "lon": 28.974167,
+  "resolved_by": "wikivoyage listing",
+  "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Galata#See"
+ },
+ "distance_m": 1161.5,
+ "duration_s": 931.4,
+ "retrieved_at": "2026-10-23T22:24:34Z",
+ "via": "OSRM route service"
+}

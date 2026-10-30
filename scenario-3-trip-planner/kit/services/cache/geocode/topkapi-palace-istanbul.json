@@ -1,0 +1,16 @@
+{
+ "kind": "geocode",
+ "query": "Topkapı Palace, Istanbul",
+ "name": "Topkapı Palace",
+ "display_name": "Topkapı Palace, Courtyard of the Concubines, Cankurtaran Mahallesi, Istanbul, Fatih, Istanbul, Marmara Region, 34122, Turkey",
+ "lat": 41.0129795,
+ "lon": 28.9840659,
+ "osm_type": "way",
+ "osm_id": 335415778,
+ "category": "tourism",
+ "type": "attraction",
+ "source": "Nominatim (OpenStreetMap)",
+ "source_url": "https://nominatim.openstreetmap.org/search?q=Topkap%C4%B1+Palace%2C+Istanbul&format=jsonv2&limit=1&accept-language=en",
+ "licence": "Data (c) OpenStreetMap contributors, ODbL (https://www.openstreetmap.org/copyright)",
+ "retrieved_at": "2026-10-23T22:22:27Z"
+}
