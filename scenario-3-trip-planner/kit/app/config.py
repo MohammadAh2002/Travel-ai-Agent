@@ -24,4 +24,7 @@ TRAVEL_API_KEY = os.getenv("TRAVEL_API_KEY", "dev-key-change-me")
 SESSION_TTL_SECONDS = int(os.getenv("SESSION_TTL_SECONDS", "86400"))
 WATCH_INTERVAL_SECONDS = max(60, int(os.getenv("WATCH_INTERVAL_SECONDS", "3600")))
 VOICE_MODEL = os.getenv("VOICE_MODEL", "tiny")
+VOICE_LANGUAGE = os.getenv("VOICE_LANGUAGE", "en").strip().lower()
+if VOICE_LANGUAGE in {"", "auto"}:
+    VOICE_LANGUAGE = None  # let Whisper auto-detect
 VOICE_ENABLED = os.getenv("VOICE_ENABLED", "true").lower() not in {"0", "false", "no"}

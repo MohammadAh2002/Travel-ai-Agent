@@ -41,5 +41,6 @@ def transcribe(audio: bytes) -> str:
     if _model is None:
         _model = WhisperModel(config.VOICE_MODEL, device="cpu", compute_type="int8")
     waveform = decode_waveform(audio)
-    segments, _ = _model.transcribe(waveform, vad_filter=True)
+    segments, _ = _model.transcribe(waveform, vad_filter=True, language=config.VOICE_LANGUAGE,
+                                    condition_on_previous_text=False)
     return " ".join(segment.text.strip() for segment in segments).strip()
