@@ -9,7 +9,7 @@ from app.agents.crew import ROLE_SPECS, CrewTaskSpec, OutputModel, SpecialistOut
 from app.agents.planner import draft_itinerary
 from app.core.guardrails import inspect_input, safe_reply
 from app.chat.flow import chat_flow, missing_trip_info
-from app.chat.itinerary import sanitize_itinerary
+from app.chat.itinerary import price_conflict_notes, sanitize_itinerary
 from app.features.map_tools import coordinates_from_text, place_from_map_link
 from app.core.models import ChatRequest, TravelerProfile
 
@@ -73,6 +73,43 @@ class ItineraryTests(unittest.TestCase):
         profile = TravelerProfile(destination="Istanbul", start_date="2026-11-03", end_date="2026-11-04",
                                   adults=2, children_count=2, budget=500)
         self.assertTrue(any("How old" in item for item in missing_trip_info(profile, {"days": 2})))
+
+    def test_family_with_child_age_gets_no_follow_up_and_counts_three_travellers(self):
+        profile = TravelerProfile(destination="Istanbul", start_date="2026-11-05", end_date="2026-11-06",
+                                  adults=2, children_count=1, children_ages=[7], budget=400)
+        self.assertFalse(any("How old" in item for item in missing_trip_info(profile, {"days": 2})))
+        item = {
+            "name": "Galata Tower",
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Galata",
+            "hours": {"closed_days": []},
+            "lat": 41.02,
+            "lon": 28.97,
+        }
+        draft = {"days": [{"date": "2026-11-05", "activities": [{"name": "Galata Tower"}]}]}
+        facts = {"find_attractions": {"attractions": [item]}}
+        result = sanitize_itinerary(draft, facts, {
+            "destination": "Istanbul", "currency": "USD", "adults": 2, "children_ages": [7],
+            "children_count": 1, "start_date": "2026-11-05", "budget": 400,
+        }, 1, {"galata tower": {"party_cost": 20, "notes": "estimate"}})
+        self.assertEqual(result["travellers"], 3)
+
+    def test_price_conflict_is_shown_as_a_range_not_a_single_price(self):
+        facts = {"find_attractions": {"attractions": [{
+            "name": "Galata Tower",
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Galata",
+            "price": {"raw": "650 TL", "amounts": {"TRY": [650]}},
+            "price_conflict": True,
+            "price_sources": [
+                {"source": "Wikivoyage", "price": {"raw": "650 TL"}},
+                {"source": "SYNTHETIC test data: 'Rihla partner price sheet'",
+                 "price": {"raw": "1300 TL (adult)"}},
+            ],
+        }]}}
+        notes = price_conflict_notes(facts)
+        self.assertEqual(len(notes), 1)
+        self.assertIn("650 TL", notes[0])
+        self.assertIn("1300 TL", notes[0])
+        self.assertIn("conflicting", notes[0])
 
 
 class ChatFlowTests(unittest.TestCase):

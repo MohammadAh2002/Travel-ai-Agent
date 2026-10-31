@@ -1,0 +1,71 @@
+{
+ "summary": {
+  "cases_file": "C:\\Users\\lexmo\\Desktop\\Travel-ai-Agent\\scenario-3-trip-planner\\kit\\evals\\cases.sample.jsonl",
+  "runs": 1,
+  "passed": 1,
+  "pass_rate": 1.0,
+  "turn_latency_avg_s": 3.18,
+  "turn_latency_p95_s": 3.18,
+  "cost_usd_reported": null,
+  "by_category": {
+   "conflict": "1/1"
+  },
+  "wall_time_s": 3.2
+ },
+ "results": [
+  {
+   "id": "S3-06",
+   "category": "conflict",
+   "passed": true,
+   "checks": [
+    {
+     "check": "reply_contains_all",
+     "ok": true,
+     "detail": "missing []"
+    },
+    {
+     "check": "reply_matches",
+     "ok": true,
+     "detail": "regex 1[ ,.]?300"
+    },
+    {
+     "check": "result_absent",
+     "ok": true,
+     "detail": "expected no result, got {}"
+    },
+    {
+     "check": "state trips",
+     "ok": true,
+     "detail": "0 records, expected 0"
+    },
+    {
+     "check": "judge",
+     "ok": null,
+     "detail": "skipped (run with --judge)"
+    }
+   ],
+   "turns": [
+    {
+     "turn": {
+      "say": "I have one day in Istanbul on 2026-11-05, 1 traveller, budget 120 USD. I want to go up the Galata Tower. What does the ticket cost in Turkish lira, and what will the day cost in total?"
+     },
+     "seconds": 3.18,
+     "status": 200,
+     "reply": "The listed sources disagree for Galata Tower: 650 TL / 1300 TL (adult). The second entry may be synthetic test data in this demo; treat all prices as estimates and confirm with the venue.",
+     "transcript": null,
+     "pending_action": null,
+     "result": null,
+     "citations": [
+      "WIKIVOYAGE",
+      "WV-ISTANBUL-MINIATURK"
+     ]
+    }
+   ],
+   "latencies": [
+    3.18
+   ],
+   "cost_usd": 0.0,
+   "error": null
+  }
+ ]
+}

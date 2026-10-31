@@ -1,11 +1,11 @@
 {
  "summary": {
-  "cases_file": "evals\\cases.extra.jsonl",
+  "cases_file": "src\\evals\\cases.extra.jsonl",
   "runs": 8,
   "passed": 8,
   "pass_rate": 1.0,
-  "turn_latency_avg_s": 2.64,
-  "turn_latency_p95_s": 5.19,
+  "turn_latency_avg_s": 1.87,
+  "turn_latency_p95_s": 4.46,
   "cost_usd_reported": null,
   "by_category": {
    "checklist": "1/1",
@@ -16,7 +16,7 @@
    "nearby": "1/1",
    "watch": "1/1"
   },
-  "wall_time_s": 23.8
+  "wall_time_s": 16.8
  },
  "results": [
   {
@@ -40,7 +40,7 @@
      "turn": {
       "say": "My flights and hotel are booked. We are buying lots of gifts. What should we prepare before we travel?"
      },
-     "seconds": 2.03,
+     "seconds": 1.45,
      "status": 200,
      "reply": "Before you travel:\n- Download offline maps and save your hotel and key addresses.\n- Install the local transit and ride app before you arrive; verify the official app in your app store.\n- Keep digital and printed copies of tickets and important reservations.\n- Check passport validity, entry requirements, travel insurance and any medication needs.\n- Save emergency contacts and your accommodation details offline.\n- Check weather again shortly before departure and pack for the forecast.\n- If you expect to bring home many gifts, compare checked-baggage weight limits and buy extra allowance from your airline early; review seat selection and baggage rules before checkout.",
      "transcript": null,
@@ -50,7 +50,7 @@
     }
    ],
    "latencies": [
-    2.03
+    1.45
    ],
    "cost_usd": 0.0,
    "error": null
@@ -76,7 +76,7 @@
      "turn": {
       "say": "Do I need a visa to visit France?"
      },
-     "seconds": 2.5,
+     "seconds": 1.42,
      "status": 200,
      "reply": "What passport nationality will you travel on? Entry requirements for France depend on it. I’ll use official government guidance only.\n\nOfficial government references:\n- [France-Visas — Official visa website](https://france-visas.gouv.fr/)\n- [European Commission — Immigration and visas](https://home-affairs.ec.europa.eu/policies/migration-and-asylum/visa-policy_en)",
      "transcript": null,
@@ -89,7 +89,7 @@
     }
    ],
    "latencies": [
-    2.5
+    1.42
    ],
    "cost_usd": 0.0,
    "error": null
@@ -120,9 +120,9 @@
      "turn": {
       "say": "I have a U.S. passport and want to visit France for tourism. Where can I check the visa rules?"
      },
-     "seconds": 5.19,
+     "seconds": 2.66,
      "status": 200,
-     "reply": "As a U.S. passport holder visiting France for tourism, you can check the visa rules using the official French visa portal, France-Visas, at https://france-visas.gouv.fr/, or consult the European Commission's immigration and visa policy information at https://home-affairs.ec.europa.eu/policies/migration-and-asylum/visa-policy_en. Please note that I do not determine legal eligibility.\n\nOfficial government references:\n- [France-Visas — Official visa website](https://france-visas.gouv.fr/)\n- [European Commission — Immigration and visas](https://home-affairs.ec.europa.eu/policies/migration-and-asylum/visa-policy_en)",
+     "reply": "To check the visa rules for visiting France with a U.S. passport, you can use the official French Ministry for Europe and Foreign Affairs visa portal at https://france-visas.gouv.fr/ or the European Commission's immigration and visas page at https://home-affairs.ec.europa.eu/policies/migration-and-asylum/visa-policy_en.\n\nOfficial government references:\n- [France-Visas — Official visa website](https://france-visas.gouv.fr/)\n- [European Commission — Immigration and visas](https://home-affairs.ec.europa.eu/policies/migration-and-asylum/visa-policy_en)",
      "transcript": null,
      "pending_action": null,
      "result": null,
@@ -133,7 +133,7 @@
     }
    ],
    "latencies": [
-    5.19
+    2.66
    ],
    "cost_usd": 0.0,
    "error": null
@@ -164,7 +164,7 @@
      "turn": {
       "say": "I'm near 41.025556,28.974167 in Istanbul. What restaurants or sights are within a 15 minute walk?"
      },
-     "seconds": 4.32,
+     "seconds": 4.46,
      "status": 200,
      "reply": "Near your pin in Istanbul (straight-line walking-time estimates; check a live map for actual routes):\n- **İbrahim Hakkı Uğrak Börek** — about 3 min / 0.22 km; [source](https://en.wikivoyage.org/wiki/Istanbul/Galata#Eat)\n- **Rüstem Pasha Mosque** — about 14 min / 0.99 km; [source](https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See)\n- **Efsane Kahvaltı** — about 14 min / 1.01 km; [source](https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#Eat)\n- **Burgerillas** — about 14 min / 0.98 km; [source](https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#Eat)\n- **Şampiyon Kokoreç** — about 14 min / 0.99 km; [source](https://en.wikivoyage.org/wiki/Istanbul/Galata#Eat)\n- **Egyptian Bazaar** — about 15 min / 1.06 km; [source](https://en.wikivoyage.org/wiki/Istanbul/Hist",
      "transcript": null,
@@ -179,7 +179,7 @@
     }
    ],
    "latencies": [
-    4.32
+    4.46
    ],
    "cost_usd": 0.0,
    "error": null
@@ -205,7 +205,7 @@
      "turn": {
       "say": "Plan a 2-day trip to Istanbul from 2026-11-03 to 2026-11-04 for two adults and two kids. Budget is 500 USD."
      },
-     "seconds": 2.66,
+     "seconds": 1.32,
      "status": 200,
      "reply": "Could you please let me know the ages of the two children traveling with you?",
      "transcript": null,
@@ -215,7 +215,7 @@
     }
    ],
    "latencies": [
-    2.66
+    1.32
    ],
    "cost_usd": 0.0,
    "error": null
@@ -244,12 +244,12 @@
        "traveller_id": "TRV-201"
       }
      },
-     "seconds": 2.54,
+     "seconds": 1.51,
      "status": 200,
      "reply": "I can remember dietary for future trips. Please approve to save these preferences.",
      "transcript": null,
      "pending_action": {
-      "action_id": "act-9e044d9162164042a8b0e5678895022a",
+      "action_id": "act-d3860cc0d4274267bd0c2ec1e663d406",
       "type": "save_preferences",
       "summary": "Save these travel preferences for future trips: dietary",
       "payload": {
@@ -271,7 +271,7 @@
        "traveller_id": "TRV-201"
       }
      },
-     "seconds": 1.27,
+     "seconds": 1.33,
      "status": 200,
      "reply": "Your preferences are saved for future trip planning.",
      "transcript": null,
@@ -283,8 +283,8 @@
     }
    ],
    "latencies": [
-    2.54,
-    1.27
+    1.51,
+    1.33
    ],
    "cost_usd": 0.0,
    "error": null
@@ -351,7 +351,7 @@
      "turn": {
       "say": "Watch hotel prices for my trip every hour."
      },
-     "seconds": 3.28,
+     "seconds": 2.65,
      "status": 200,
      "reply": "I've started an hourly watch for available weather and currency updates. Hotel prices and flight availability aren't provided by this trip data service, so I can't monitor those.",
      "transcript": null,
@@ -361,7 +361,7 @@
     }
    ],
    "latencies": [
-    3.28
+    2.65
    ],
    "cost_usd": 0.0,
    "error": null
