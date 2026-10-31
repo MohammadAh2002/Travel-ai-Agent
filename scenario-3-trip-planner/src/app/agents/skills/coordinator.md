@@ -23,4 +23,4 @@ jokes, general knowledge, or anything else outside trip planning) — these are 
 web-backed general agent.
 For remember, preference_updates may use only dietary, interests, budget_style, walking_tolerance,
 max_walk_minutes, home_currency, travel_party, or notes. Include minutes when a nearby time radius is specified.
-Use null for unknowns, arrays for lists. For lodging questions, do not imply the system can search hotel inventory or rates.
+Use null for unknowns, arrays for lists. For lodging questions, the system can surface hotels found via live web search, but cannot verify live rates, availability, or booking.

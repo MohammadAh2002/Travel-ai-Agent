@@ -267,17 +267,20 @@ class CrewTests(unittest.TestCase):
 class LodgingFlowTests(unittest.TestCase):
     def test_lodging_advisor_does_not_create_a_pending_write(self):
         extracted = {"intent": "lodging"}
+        sources = [{"id": "web-1", "title": "Hotels near Sirkeci station",
+                    "url": "https://example.com/hotels"}]
         with patch("app.chat.flow.coordinate", new=AsyncMock(
                 return_value=(extracted, {"cost_usd": None, "total_tokens": 1}))), \
-                patch("app.chat.flow.advise_specialist", new=AsyncMock(
-                    return_value=({"answer": "I cannot search hotel listings or prices."},
-                                  {"cost_usd": None, "total_tokens": 3}))):
+                patch("app.chat.flow.advise_lodging", new=AsyncMock(
+                    return_value=("Unverified suggestion: Hotel A near Sirkeci station.",
+                                  {"cost_usd": None, "total_tokens": 3}, sources))):
             response = asyncio.run(chat_flow(ChatRequest(
                 session_id="lodging-test",
                 message="Can you find a hotel near the museums?",
             )))
 
-        self.assertIn("cannot search hotel", response["reply"])
+        self.assertIn("Hotel A", response["reply"])
+        self.assertEqual(response["citations"], sources)
         self.assertIsNone(response["pending_action"])
         self.assertFalse(response["usage"]["cost_known"])
         self.assertEqual(response["usage"]["total_tokens"], 4)

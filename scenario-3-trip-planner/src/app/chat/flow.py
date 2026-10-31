@@ -9,8 +9,8 @@ from pathlib import Path
 from openai import APIConnectionError, APIStatusError, APITimeoutError
 
 from ..agents import (
-    advise_documents, advise_specialist, answer_general, budget_summary, coordinate, draft_itinerary,
-    research, verify_itinerary,
+    advise_documents, advise_lodging, advise_specialist, answer_general, budget_summary, coordinate,
+    draft_itinerary, research, verify_itinerary,
 )
 from ..core.guardrails import inspect_input, safe_reply
 from ..core.models import ChatRequest
@@ -409,21 +409,21 @@ async def chat_flow(req: ChatRequest) -> dict:
                         usage=usage_summary())
 
     if intent == "lodging":
+        agents.append({"name": "Lodging Advisor", "status": "working"})
         try:
-            result, usage = await advise_specialist(
-                "lodging_advisor",
-                "Respond to the traveller's lodging question. The system has no hotel inventory or hotel-price API: do not name, compare, verify, or claim to search hotels. Use only traveller-provided lodging details, explain what detail would help assess its effect on the itinerary, and ask one focused follow-up if needed.",
-                {"message": req.message, "profile": profile, "history": state.history[-8:]},
-            )
+            reply, usage, sources = await advise_lodging(req.message, profile, state.history)
             record_usage(usage)
-            reply = result["answer"]
         except Exception:
-            reply = "I can't search hotel listings or prices in this system. If you share your hotel or area, I can help assess how it may affect your itinerary."
-        agents.append({"name": "Lodging Advisor", "status": "completed"})
+            reply = ("I couldn't retrieve live hotel suggestions right now. If you share your "
+                     "hotel or area, I can help assess how it may affect your itinerary.")
+            sources = []
+        agents[-1]["status"] = "completed"
         state.last_agents = agents
+        state.last_sources = sources
         state.history.append({"role": "assistant", "content": reply})
         save_session(state)
-        return response(reply, state=state.model_dump(), usage=usage_summary())
+        return response(reply, state=state.model_dump(), citations=sources,
+                        usage=usage_summary())
 
     if intent == "weather":
         city = state.profile.destination or extracted.get("destination")

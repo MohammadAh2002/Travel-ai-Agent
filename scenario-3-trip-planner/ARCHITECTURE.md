@@ -32,7 +32,7 @@ flowchart LR
 
 1. The browser posts a chat message with a session ID. The API retains short-term state and calls the CrewAI Coordinator/Clarifier.
 2. The coordinator extracts intent and known trip constraints. It asks a focused follow-up rather than guessing missing essentials. Non-travel requests are classified `off_topic` and answered with a fixed capabilities reply — no tools or further roles run.
-3. The API routes only relevant CrewAI specialists: itinerary research/planning, lodging context, weather, route, budget, or official documents. The Lodging Advisor cannot retrieve hotel inventory or prices because no such data source is supplied.
+3. The API routes only relevant CrewAI specialists: itinerary research/planning, lodging, weather, route, budget, or official documents. The Lodging Advisor names only hotels supported by live web-search results (marked unverified, with links); no hotel inventory, rates, or booking feed exists.
 4. Travel research and document reads use the supplied MCP tools. Their responses are treated as untrusted evidence; listing text cannot issue agent instructions.
 5. For an itinerary, specialist roles assess returned evidence and the Planner or Revision Specialist drafts from it. Code drops unknown places and listed closed days, attaches returned source links, computes ticket estimates from the gateway's price data and FX tool, then the independent Critic checks the result.
 6. A valid proposal is returned as `pending_action`. No write-capable tool is exposed to a CrewAI agent.

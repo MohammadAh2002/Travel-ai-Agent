@@ -163,4 +163,4 @@ this demo); only approved trips and preferences survive, because they live in th
 - Replay data covers the kit's cached cities (Istanbul, Amman); other destinations need live/record mode.
 - Sessions and watches are in-process; a production version needs durable storage and a scheduler.
 - Listed prices/hours can be stale; conversions are estimates; child pricing is not inferred.
-- No booking, hotel inventory, flight data, pharmacy listings, or legal eligibility determination.
+- No booking, live hotel rates/availability, flight data, pharmacy listings, or legal eligibility determination. Hotel suggestions come from live web search and are unverified.

@@ -142,7 +142,7 @@ See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the full request flow, and [`SUMMAR
 - Nearby distance is a straight-line walking-time estimate, not routed navigation. This data kit has no pharmacy listings.
 - Visa and entry rules depend on passport nationality, trip purpose, transit and travel dates. The advisor is informational, not legal advice; confirm uncertain cases with the relevant embassy or consulate.
 - Watches can check the gateway's weather/FX data. No hotel or flight pricing feed exists.
-- The Lodging Advisor can use hotel details the traveller provides to reason about itinerary impact, but cannot search, compare, price, or book hotels because the kit has no hotel inventory API.
+- The Lodging Advisor suggests hotels found via live web search (clearly marked unverified, with source links) and can use hotel details the traveller provides to reason about itinerary impact. It cannot check live rates or availability or book hotels — no hotel inventory API exists.
 - Session state and watches live in process memory and clear on restart. Production deployment should use durable storage and a managed scheduler.
 - Voice requires microphone permission and a compatible faster-whisper install; normal text chat still works without voice.
 
