@@ -7,11 +7,13 @@ from unittest.mock import AsyncMock, patch
 
 from app.agents.crew import ROLE_SPECS, CrewTaskSpec, OutputModel, SpecialistOutput, run_crew
 from app.agents.planner import draft_itinerary
+from app.agents.researcher import activity_terms, normalize_interests, unsupported_activities
 from app.core.guardrails import inspect_input, safe_reply
 from app.chat.flow import chat_flow, missing_trip_info
-from app.chat.itinerary import price_conflict_notes, sanitize_itinerary
+from app.chat.itinerary import fill_empty_days, price_conflict_notes, sanitize_itinerary
 from app.features.map_tools import coordinates_from_text, place_from_map_link
 from app.core.models import ChatRequest, TravelerProfile
+from app.services.memory import get_session
 
 
 class GuardrailTests(unittest.TestCase):
@@ -93,6 +95,97 @@ class ItineraryTests(unittest.TestCase):
         }, 1, {"galata tower": {"party_cost": 20, "notes": "estimate"}})
         self.assertEqual(result["travellers"], 3)
 
+    def test_paraphrased_and_accented_names_still_match_sourced_places(self):
+        items = [
+            {"name": "Cable car", "alt": "Teleferik", "kind": "do",
+             "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Golden_Horn#Do",
+             "hours": {"closed_days": []}},
+            {"name": "Süleymaniye Mosque", "kind": "see",
+             "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+             "hours": {"closed_days": []}},
+        ]
+        draft = {"days": [{"date": "2026-11-05", "activities": [
+            {"name": "Pierre Loti cable car ride", "start_time": "09:00", "end_time": "10:00"},
+            {"name": "Teleferik", "start_time": "10:30", "end_time": "11:00"},
+            {"name": "Suleymaniye Mosque", "start_time": "11:30", "end_time": "12:30"},
+            {"name": "Sky diving zone", "start_time": "13:00", "end_time": "14:00"},
+        ]}]}
+        facts = {"find_attractions": {"attractions": items}}
+        result = sanitize_itinerary(draft, facts, {
+            "destination": "Istanbul", "currency": "USD", "adults": 2,
+            "children_ages": [7], "children_count": 1, "start_date": "2026-11-05", "budget": 400,
+        }, 1, {})
+        names = [activity["name"] for activity in result["days"][0]["activities"]]
+        self.assertEqual(names, ["Cable car", "Cable car", "Süleymaniye Mosque"])
+
+    def test_fill_empty_days_backfills_dropped_dates_with_sourced_places(self):
+        facts = {"find_attractions": {"attractions": [
+            {"name": "History Museum", "kind": "see", "hours": {"closed_days": []},
+             "source_url": "https://en.wikivoyage.org/wiki/Istanbul"},
+            {"name": "Cable car", "kind": "do", "hours": {"closed_days": []},
+             "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Golden_Horn#Do"},
+            {"name": "City Park", "kind": "see", "hours": {"closed_days": []},
+             "source_url": "https://en.wikivoyage.org/wiki/Istanbul"},
+            {"name": "Old Fort", "kind": "see", "hours": {"closed_days": []},
+             "source_url": "https://en.wikivoyage.org/wiki/Istanbul"},
+            {"name": "Closed Bazaar", "kind": "buy", "hours": {"closed_days": ["Sat"]},
+             "source_url": "https://en.wikivoyage.org/wiki/Istanbul"},
+        ]}}
+        proposed = {"days": [{"date": "2026-11-05", "activities": [
+            {"name": "History Museum", "start_time": "09:00", "end_time": "11:00"}]}]}
+        draft = {"days": [
+            {"date": "2026-11-05", "activities": [{"name": "History Museum"}]},
+            {"date": "2026-11-06", "activities": [{"name": "Sky diving zone"}]},
+            {"date": "2026-11-07", "activities": [{"name": "Scuba boat"}]},
+            {"date": "2026-11-08", "activities": [{"name": "Snow arena"}]},
+        ]}
+        filled = fill_empty_days(proposed, facts, {"start_date": "2026-11-05"}, 4, draft=draft)
+        days = {day["date"]: day for day in proposed["days"]}
+        self.assertEqual([day["date"] for day in proposed["days"]],
+                         ["2026-11-05", "2026-11-06", "2026-11-07"])
+        self.assertEqual(filled, ["2026-11-06", "2026-11-07"])
+        # a planned day whose stops could not be verified prefers 'do'/'buy' listings
+        self.assertEqual(days["2026-11-06"]["activities"][0]["name"], "Cable car")
+        saturday_names = [a["name"] for a in days["2026-11-07"]["activities"]]
+        self.assertNotIn("Closed Bazaar", saturday_names)  # closed on Saturday
+        self.assertEqual(saturday_names, ["Old Fort"])
+
+    def test_venues_repeated_across_days_are_dropped_and_refilled(self):
+        # a draft that stalls on two requested places must not become a 4-day loop of repeats
+        extras = [{"name": f"Sourced Place {index}", "kind": "see",
+                   "hours": {"closed_days": []},
+                   "source_url": "https://en.wikivoyage.org/wiki/Istanbul"}
+                  for index in range(9)]
+        facts = {"find_attractions": {"attractions": [
+            {"name": "Cable car", "kind": "do", "hours": {"closed_days": []},
+             "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Golden_Horn#Do"},
+            {"name": "Grand Bazaar", "kind": "buy", "hours": {"closed_days": []},
+             "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#Buy"},
+            *extras,
+        ]}}
+        draft = {"days": [
+            {"date": "2026-11-05", "activities": [
+                {"name": "Cable car", "start_time": "09:30", "end_time": "10:30"},
+                {"name": "Grand Bazaar", "start_time": "14:00", "end_time": "16:00"}]},
+            {"date": "2026-11-06", "activities": [{"name": "Grand Bazaar"}]},
+            {"date": "2026-11-07", "activities": [{"name": "Cable car"}]},
+            {"date": "2026-11-08", "activities": [{"name": "Cable car"}]},
+        ]}
+        profile = {"destination": "Istanbul", "currency": "USD", "adults": 3,
+                   "children_ages": [], "children_count": 0, "start_date": "2026-11-05",
+                   "budget": 400}
+        proposed = sanitize_itinerary(draft, facts, profile, 4, {})
+        # day 1 keeps both requested stops; the repeats on later days are dropped
+        self.assertEqual([day["date"] for day in proposed["days"]], ["2026-11-05"])
+        self.assertEqual([a["name"] for a in proposed["days"][0]["activities"]],
+                         ["Cable car", "Grand Bazaar"])
+        fill_empty_days(proposed, facts, profile, 4, {}, draft=draft)
+        self.assertEqual([day["date"] for day in proposed["days"]],
+                         ["2026-11-05", "2026-11-06", "2026-11-07", "2026-11-08"])
+        names = [activity["name"].casefold() for day in proposed["days"]
+                 for activity in day["activities"]]
+        self.assertEqual(len(names), len(set(names)))  # every venue appears once in the trip
+
     def test_price_conflict_is_shown_as_a_range_not_a_single_price(self):
         facts = {"find_attractions": {"attractions": [{
             "name": "Galata Tower",
@@ -140,7 +233,7 @@ class ChatFlowTests(unittest.TestCase):
         extracted = {
             "intent": "itinerary", "destination": "Istanbul", "start_date": "2026-11-05",
             "end_date": "2026-11-05", "days": 1, "adults": 1, "children_count": 0,
-            "children_ages": [], "budget": 100, "currency": "USD",
+            "children_ages": [], "budget": 100, "currency": "USD", "interests": ["history"],
         }
         facts = {
             "find_attractions": {"ok": True, "attractions": [{
@@ -190,11 +283,399 @@ class ChatFlowTests(unittest.TestCase):
         self.assertEqual(draft_call.await_args.args[0]["current_request"]["message"],
                          "Plan one day in Istanbul.")
 
+    def test_vague_plan_request_asks_day_style_question_before_planning(self):
+        extracted = {
+            "intent": "itinerary", "destination": "Istanbul", "start_date": "2026-11-05",
+            "end_date": "2026-11-06", "days": 2, "adults": 3, "children_count": 0,
+            "children_ages": [], "budget": 400, "currency": "USD",
+        }
+        with patch("app.chat.flow.coordinate", new=AsyncMock(return_value=(extracted, {"cost_usd": 0}))):
+            response = asyncio.run(chat_flow(ChatRequest(
+                session_id="style-question-test",
+                message="Plan 2 days in Istanbul, 3 travellers, 400 USD.",
+            )))
+        self.assertIsNone(response["pending_action"])
+        self.assertIn("shopping", response["reply"].lower())
+        self.assertEqual(response["tool_calls"], [])
+
+    def test_revision_searches_for_new_activities_and_keeps_previous_places(self):
+        state = get_session("revise-activity-test")
+        state.itinerary = {"days": [{"date": "2026-11-05", "activities": [{"name": "Hagia Sophia"}]}]}
+        state.history = [{"role": "user",
+                          "content": "add me activit ike riding ship and telfrici"}]
+        extracted = {
+            "intent": "revise", "destination": "Istanbul", "start_date": "2026-11-05",
+            "end_date": "2026-11-06", "days": 2, "adults": 3, "children_count": 0,
+            "children_ages": [], "budget": 400, "currency": "USD",
+            "interests": ["riding ship", "telfric"],
+        }
+        facts = {
+            "find_attractions": {"ok": True, "attractions": [
+                {"name": "Hagia Sophia",
+                 "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+                 "hours": {"closed_days": []}},
+                {"name": "Cable car",
+                 "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Golden_Horn#Do",
+                 "hours": {"closed_days": []}},
+                {"name": "MegaPass Istanbul",
+                 "source_url": "https://en.wikivoyage.org/wiki/Istanbul",
+                 "hours": {"closed_days": []}},
+            ]},
+            "find_restaurants": {"ok": True, "restaurants": []},
+            "get_weather": {"ok": True},
+        }
+        draft = {"days": [
+            {"date": "2026-11-05", "activities": [
+                {"name": "Hagia Sophia", "start_time": "09:00", "end_time": "10:30"},
+                {"name": "MegaPass Istanbul", "start_time": "11:00", "end_time": "13:00"},
+            ]},
+            {"date": "2026-11-06", "activities": [
+                {"name": "Cable car", "start_time": "10:00", "end_time": "11:00"},
+            ]},
+        ]}
+
+        @asynccontextmanager
+        async def fake_connection():
+            yield object()
+
+        research_call = AsyncMock(return_value=(facts, [
+            {"tool": "find_attractions", "ok": True, "agent": "Researcher"},
+        ]))
+        web_ideas = AsyncMock(return_value=[{
+            "title": "Day trips from Istanbul", "url": "https://example.com/day-trips",
+            "snippet": "Excursions outside the city.",
+        }])
+        with patch("app.chat.flow.coordinate", new=AsyncMock(
+                return_value=(extracted, {"cost_usd": None, "total_tokens": 1}))), \
+                patch("app.chat.flow.connection", fake_connection), \
+                patch("app.chat.flow.research", new=research_call), \
+                patch("app.chat.flow.web_activity_ideas", new=web_ideas), \
+                patch("app.chat.flow.draft_itinerary", new=AsyncMock(return_value=(
+                    draft, {"cost_usd": None, "total_tokens": 1,
+                            "agents_run": ["Itinerary Revision Specialist"]}))), \
+                patch("app.chat.flow.verify_selected_hours", new=AsyncMock()), \
+                patch("app.chat.flow.estimate_routes", new=AsyncMock(return_value={})), \
+                patch("app.chat.flow.verify_costs", new=AsyncMock(return_value={})), \
+                patch("app.chat.flow.verify_itinerary", new=AsyncMock(return_value=(
+                    {"approved": True, "issues": [], "note": "valid"},
+                    {"cost_usd": None, "total_tokens": 1, "agents_run": ["Independent Itinerary Critic"]},
+                ))):
+            response = asyncio.run(chat_flow(ChatRequest(
+                session_id="revise-activity-test",
+                message="make day 3 activite even if outside instbul",
+            )))
+
+        extras = research_call.await_args.kwargs["extra_queries"]
+        self.assertEqual(extras[0], "cruise, cable car")
+        self.assertIn("Hagia Sophia", extras[1])
+        web_ideas.assert_awaited_once()
+        self.assertEqual(web_ideas.await_args.args[1], "cruise, cable car, riding ship, telfric")
+        self.assertIn("live web search", response["reply"].lower())
+        self.assertIn("https://example.com/day-trips", response["reply"])
+        names = [activity["name"]
+                 for day in response["pending_action"]["payload"]["itinerary"]["days"]
+                 for activity in day["activities"]]
+        self.assertEqual(names, ["Hagia Sophia", "MegaPass Istanbul", "Cable car"])
+
+    def test_unsupported_activity_caveat_survives_across_revision_turns(self):
+        state = get_session("revise-unsupported-history-test")
+        state.itinerary = {"days": [{"date": "2026-11-05", "activities": [{"name": "Hagia Sophia"}]}]}
+        state.history = [{"role": "user",
+                          "content": "one day for sky diving or diving in see and telfrici"}]
+        extracted = {
+            "intent": "revise", "destination": "Istanbul", "start_date": "2026-11-05",
+            "end_date": "2026-11-06", "days": 2, "adults": 2, "children_count": 1,
+            "children_ages": [7], "budget": 400, "currency": "USD",
+            "interests": ["islamic history"],
+        }
+        facts = {
+            "find_attractions": {"ok": True, "attractions": [
+                {"name": "Hagia Sophia",
+                 "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+                 "hours": {"closed_days": []}},
+                {"name": "Cable car", "kind": "do",
+                 "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Golden_Horn#Do",
+                 "hours": {"closed_days": []}},
+            ]},
+            "find_restaurants": {"ok": True, "restaurants": []},
+        }
+        draft = {"days": [
+            {"date": "2026-11-05", "activities": [
+                {"name": "Hagia Sophia", "start_time": "09:00", "end_time": "10:30"}]},
+            {"date": "2026-11-06", "activities": [
+                {"name": "Cable car", "start_time": "10:00", "end_time": "11:00"}]},
+        ]}
+        patches = self._planning_mocks(facts, draft)
+        web_ideas = AsyncMock(return_value=[])
+        with patch("app.chat.flow.coordinate", new=AsyncMock(
+                return_value=(extracted, {"cost_usd": None, "total_tokens": 1}))), \
+                patch("app.chat.flow.web_activity_ideas", new=web_ideas):
+            for p in patches:
+                p.start()
+            try:
+                response = asyncio.run(chat_flow(ChatRequest(
+                    session_id="revise-unsupported-history-test",
+                    message="make day 2 more relaxed",
+                )))
+            finally:
+                for p in patches:
+                    p.stop()
+        # the sky-diving/diving request came from the previous message, not this one
+        self.assertIn("sky diving", response["reply"])
+        self.assertIn("sea/scuba diving", response["reply"])
+        web_ideas.assert_awaited_once()
+        query = web_ideas.await_args.args[1]
+        self.assertIn("sky diving", query)
+        self.assertIn("cable car", query)
+
+    def test_unverifiable_revision_day_is_filled_not_dropped(self):
+        state = get_session("revise-fill-day-test")
+        state.itinerary = {"days": [{"date": "2026-11-05", "activities": [{"name": "Hagia Sophia"}]}]}
+        extracted = {
+            "intent": "revise", "destination": "Istanbul", "start_date": "2026-11-05",
+            "end_date": "2026-11-07", "days": 3, "adults": 2, "children_count": 1,
+            "children_ages": [7], "budget": 400, "currency": "USD",
+        }
+        facts = {
+            "find_attractions": {"ok": True, "attractions": [
+                {"name": "Hagia Sophia", "kind": "see",
+                 "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+                 "hours": {"closed_days": []}},
+                {"name": "Cable car", "kind": "do",
+                 "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Golden_Horn#Do",
+                 "hours": {"closed_days": []}},
+                {"name": "City Museum", "kind": "see",
+                 "source_url": "https://en.wikivoyage.org/wiki/Istanbul",
+                 "hours": {"closed_days": []}},
+                {"name": "Public Garden", "kind": "see",
+                 "source_url": "https://en.wikivoyage.org/wiki/Istanbul",
+                 "hours": {"closed_days": []}},
+                {"name": "Old Library", "kind": "see",
+                 "source_url": "https://en.wikivoyage.org/wiki/Istanbul",
+                 "hours": {"closed_days": []}},
+            ]},
+            "find_restaurants": {"ok": True, "restaurants": []},
+        }
+        # the planner drafts an unsourcable activity day: every stop fails verification
+        draft = {"days": [
+            {"date": "2026-11-05", "activities": [
+                {"name": "Hagia Sophia", "start_time": "09:00", "end_time": "10:30"}]},
+            {"date": "2026-11-06", "activities": [
+                {"name": "Sky diving zone", "start_time": "10:00", "end_time": "12:00"}]},
+            {"date": "2026-11-07", "activities": [
+                {"name": "Hagia Sophia", "start_time": "09:00", "end_time": "10:30"}]},
+        ]}
+        patches = self._planning_mocks(facts, draft)
+        with patch("app.chat.flow.coordinate", new=AsyncMock(
+                return_value=(extracted, {"cost_usd": None, "total_tokens": 1}))), \
+                patch("app.chat.flow.web_activity_ideas", new=AsyncMock(return_value=[])):
+            for p in patches:
+                p.start()
+            try:
+                response = asyncio.run(chat_flow(ChatRequest(
+                    session_id="revise-fill-day-test",
+                    message="make day 2 activite even if outside instbul",
+                )))
+            finally:
+                for p in patches:
+                    p.stop()
+        itinerary = response["pending_action"]["payload"]["itinerary"]
+        self.assertEqual([day["date"] for day in itinerary["days"]],
+                         ["2026-11-05", "2026-11-06", "2026-11-07"])
+        self.assertEqual(itinerary["days"][1]["activities"][0]["name"], "Cable car")
+        # day 3's Hagia Sophia repeat was dropped; the gap refilled with a fresh sourced place
+        self.assertEqual(itinerary["days"][2]["activities"][0]["name"], "Old Library")
+        self.assertIn("filled", response["reply"])
+
+    def test_hotel_request_without_preferences_asks_stars_and_meals(self):
+        extracted = {"intent": "lodging", "destination": "Istanbul"}
+        with patch("app.chat.flow.coordinate", new=AsyncMock(return_value=(extracted, {"cost_usd": 0}))), \
+                patch("app.chat.flow.advise_lodging", new=AsyncMock()) as lodging_call:
+            response = asyncio.run(chat_flow(ChatRequest(session_id="lodging-questions-test",
+                                                         message="Find me a hotel in Istanbul.")))
+        self.assertIn("stars", response["reply"].lower())
+        self.assertIn("breakfast", response["reply"].lower())
+        self.assertFalse(lodging_call.called)
+        self.assertIsNone(response["pending_action"])
+
+    def test_hotel_request_with_preferences_searches_the_web(self):
+        extracted = {"intent": "lodging", "destination": "Istanbul",
+                     "hotel_stars": 4, "hotel_board": "breakfast"}
+        sources = [{"id": "web-1", "title": "Hotel list", "url": "https://example.com/hotels"}]
+        with patch("app.chat.flow.coordinate", new=AsyncMock(return_value=(extracted, {"cost_usd": 0}))), \
+                patch("app.chat.flow.advise_lodging", new=AsyncMock(
+                    return_value=("**Hotel A** — fits — https://example.com/hotels",
+                                  {"cost_usd": None, "total_tokens": 1}, sources))) as lodging_call:
+            response = asyncio.run(chat_flow(ChatRequest(
+                session_id="lodging-search-test",
+                message="Find me a 4 star hotel in Istanbul with breakfast.")))
+        self.assertTrue(lodging_call.called)
+        profile_arg = lodging_call.await_args.args[1]
+        self.assertEqual(profile_arg["hotel_stars"], 4)
+        self.assertEqual(profile_arg["hotel_board"], "breakfast")
+        self.assertEqual(response["citations"], sources)
+
+    def test_flight_request_asks_bags_weight_and_time_preference(self):
+        extracted = {"intent": "flight", "destination": "Istanbul"}
+        with patch("app.chat.flow.coordinate", new=AsyncMock(return_value=(extracted, {"cost_usd": 0}))), \
+                patch("app.chat.flow.advise_flight", new=AsyncMock()) as flight_call:
+            response = asyncio.run(chat_flow(ChatRequest(session_id="flight-questions-test",
+                                                         message="I need plane tickets to Istanbul.")))
+        reply = response["reply"].lower()
+        self.assertIn("flying from", reply)
+        self.assertIn("checked bags", reply)
+        self.assertIn("kg", reply)
+        self.assertIn("morning", reply)
+        self.assertFalse(flight_call.called)
+
+    def test_flight_request_with_answers_gives_advice(self):
+        extracted = {"intent": "flight", "destination": "Istanbul", "origin": "Amman",
+                     "flight_bags": 2, "flight_bag_kg": 23, "flight_time_pref": "any"}
+        sources = [{"id": "web-1", "title": "Baggage rules", "url": "https://example.com/bags"}]
+        with patch("app.chat.flow.coordinate", new=AsyncMock(return_value=(extracted, {"cost_usd": 0}))), \
+                patch("app.chat.flow.advise_flight", new=AsyncMock(
+                    return_value=("Two 23 kg bags fit typical full-service allowances …",
+                                  {"cost_usd": None, "total_tokens": 1}, sources))) as flight_call:
+            response = asyncio.run(chat_flow(ChatRequest(
+                session_id="flight-advice-test",
+                message="2 bags of 23kg from Amman, time doesn't matter.")))
+        self.assertTrue(flight_call.called)
+        profile_arg = flight_call.await_args.args[1]
+        self.assertEqual(profile_arg["flight_bags"], 2)
+        self.assertEqual(profile_arg["flight_bag_kg"], 23.0)
+        self.assertEqual(profile_arg["flight_time_pref"], "any")
+        self.assertEqual(response["citations"], sources)
+
+    def _planning_mocks(self, facts, draft):
+        @asynccontextmanager
+        async def fake_connection():
+            yield object()
+
+        return [
+            patch("app.chat.flow.connection", fake_connection),
+            patch("app.chat.flow.research", new=AsyncMock(return_value=(
+                facts, [{"tool": "find_attractions", "ok": True, "agent": "Researcher"}]))),
+            patch("app.chat.flow.draft_itinerary", new=AsyncMock(return_value=(
+                draft, {"cost_usd": None, "total_tokens": 1, "agents_run": ["Itinerary Planner"]}))),
+            patch("app.chat.flow.verify_selected_hours", new=AsyncMock()),
+            patch("app.chat.flow.estimate_routes", new=AsyncMock(return_value={})),
+            patch("app.chat.flow.verify_costs", new=AsyncMock(return_value={})),
+            patch("app.chat.flow.verify_itinerary", new=AsyncMock(return_value=(
+                {"approved": True, "issues": [], "note": "valid"},
+                {"cost_usd": None, "total_tokens": 1, "agents_run": ["Independent Itinerary Critic"]}))),
+        ]
+
+    def test_days_longer_than_dates_extends_the_plan_and_says_so(self):
+        extracted = {
+            "intent": "itinerary", "destination": "Istanbul", "start_date": "2026-11-05",
+            "end_date": "2026-11-06", "days": 4, "adults": 2, "children_count": 1,
+            "children_ages": [7], "budget": 400, "currency": "USD", "interests": ["islamic history"],
+        }
+        facts = {
+            "find_attractions": {"ok": True, "attractions": [{
+                "name": "Historic Mosque",
+                "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula",
+                "hours": {"closed_days": []},
+            }] + [
+                {"name": f"Sourced Place {index}", "kind": "see",
+                 "source_url": "https://en.wikivoyage.org/wiki/Istanbul",
+                 "hours": {"closed_days": []}}
+                for index in range(9)
+            ]},
+            "find_restaurants": {"ok": True, "restaurants": []},
+        }
+        draft = {"days": [
+            {"date": d, "activities": [{"name": "Historic Mosque",
+                                        "start_time": "09:00", "end_time": "10:30"}]}
+            for d in ("2026-11-05", "2026-11-06", "2026-11-07", "2026-11-08")
+        ]}
+        patches = self._planning_mocks(facts, draft)
+        with patch("app.chat.flow.coordinate", new=AsyncMock(
+                return_value=(extracted, {"cost_usd": None, "total_tokens": 1}))):
+            for p in patches:
+                p.start()
+            try:
+                response = asyncio.run(chat_flow(ChatRequest(
+                    session_id="days-extension-test",
+                    message="Plan a 4-day trip to Istanbul on 2026-11-05 and 2026-11-06.",
+                )))
+            finally:
+                for p in patches:
+                    p.stop()
+        itinerary = response["pending_action"]["payload"]["itinerary"]
+        self.assertEqual(len(itinerary["days"]), 4)
+        self.assertEqual(itinerary["days"][-1]["date"], "2026-11-08")
+        self.assertIn("asked for 4 days", response["reply"])
+
+    def test_unsupported_adventure_activities_become_a_note_not_a_refusal(self):
+        extracted = {
+            "intent": "itinerary", "destination": "Istanbul", "start_date": "2026-11-05",
+            "end_date": "2026-11-06", "days": 2, "adults": 2, "children_count": 1,
+            "children_ages": [7], "budget": 400, "currency": "USD", "interests": ["islamic history"],
+        }
+        facts = {
+            "find_attractions": {"ok": True, "attractions": [{
+                "name": "Cable car", "tags": ["views"], "kind": "do",
+                "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Golden_Horn#Do",
+                "hours": {"closed_days": []},
+            }, {
+                "name": "Harbour Museum", "kind": "see",
+                "source_url": "https://en.wikivoyage.org/wiki/Istanbul",
+                "hours": {"closed_days": []},
+            }]},
+            "find_restaurants": {"ok": True, "restaurants": []},
+        }
+        draft = {"days": [
+            {"date": "2026-11-05", "activities": [{"name": "Cable car",
+                                                   "start_time": "09:00", "end_time": "10:30"}]},
+            {"date": "2026-11-06", "activities": [{"name": "Cable car",
+                                                   "start_time": "09:00", "end_time": "10:30"}]},
+        ]}
+        patches = self._planning_mocks(facts, draft)
+        web_ideas = AsyncMock(return_value=[{
+            "title": "Skydiving Istanbul", "url": "https://example.com/skydiving",
+            "snippet": "Tandem skydiving near Istanbul.",
+        }])
+        with patch("app.chat.flow.coordinate", new=AsyncMock(
+                return_value=(extracted, {"cost_usd": None, "total_tokens": 1}))), \
+                patch("app.chat.flow.web_activity_ideas", new=web_ideas):
+            for p in patches:
+                p.start()
+            try:
+                response = asyncio.run(chat_flow(ChatRequest(
+                    session_id="unsupported-activity-test",
+                    message="We like islamic history and one day for sky diving or diving in see or snow and telfrici.",
+                )))
+            finally:
+                for p in patches:
+                    p.stop()
+        self.assertIsNotNone(response["pending_action"])
+        self.assertIn("sky diving", response["reply"])
+        self.assertIn("snow", response["reply"])
+        self.assertIn("live web search", response["reply"].lower())
+        self.assertIn("https://example.com/skydiving", response["reply"])
+        self.assertTrue(any(c["url"] == "https://example.com/skydiving"
+                            for c in response["citations"]))
+        web_ideas.assert_awaited_once()
+        names = [activity["name"] for day in
+                 response["pending_action"]["payload"]["itinerary"]["days"]
+                 for activity in day["activities"]]
+        self.assertEqual(names, ["Cable car", "Harbour Museum"])
+
+    def test_interest_aliases_turn_islami_history_into_tag_words(self):
+        self.assertEqual(normalize_interests("islami history"), "religious, history")
+        self.assertEqual(normalize_interests("ottoman mosques"), "history, religious")
+        self.assertEqual(unsupported_activities("sky diving or diving in see or snow"),
+                         ["sky diving", "sea/scuba diving", "snow activities"])
+        self.assertEqual(unsupported_activities("museum and bazaar"), [])
+        self.assertIn("cable car", activity_terms("telfrici"))
+
 
 class CrewTests(unittest.TestCase):
     def test_specialist_roles_are_registered(self):
-        self.assertEqual(len(ROLE_SPECS), 11)
+        self.assertEqual(len(ROLE_SPECS), 12)
         self.assertIn("lodging_advisor", ROLE_SPECS)
+        self.assertIn("flight_advisor", ROLE_SPECS)
         self.assertIn("revision_specialist", ROLE_SPECS)
         self.assertIn("general_agent", ROLE_SPECS)
 
@@ -266,7 +747,8 @@ class CrewTests(unittest.TestCase):
 
 class LodgingFlowTests(unittest.TestCase):
     def test_lodging_advisor_does_not_create_a_pending_write(self):
-        extracted = {"intent": "lodging"}
+        extracted = {"intent": "lodging", "destination": "Istanbul",
+                     "hotel_stars": 4, "hotel_board": "breakfast"}
         sources = [{"id": "web-1", "title": "Hotels near Sirkeci station",
                     "url": "https://example.com/hotels"}]
         with patch("app.chat.flow.coordinate", new=AsyncMock(
@@ -297,6 +779,20 @@ class GeneralAgentTests(unittest.TestCase):
         self.assertEqual(results[0]["url"], "https://en.wikipedia.org/wiki/Galata_Tower")
         self.assertEqual(results[0]["title"], "Galata Tower - Wikipedia")
         self.assertIn("Istanbul", results[0]["snippet"])
+
+    def test_general_agent_answers_from_knowledge_when_search_is_empty(self):
+        from app.agents.general import answer_general
+
+        with patch("app.agents.general.web_search", new=AsyncMock(
+                return_value={"results": [], "error": "no results"})), \
+                patch("app.agents.general.run_crew", new=AsyncMock(return_value=(
+                    {"answer": "Paris is the capital of France.", "caveats": []},
+                    {"cost_usd": None}, ["General Knowledge Agent"]))) as crew_call:
+            reply, _usage, citations = asyncio.run(answer_general("What is the capital of France?"))
+
+        self.assertIn("Paris", reply)
+        self.assertEqual(citations, [])
+        self.assertTrue(crew_call.called)
 
     def test_off_topic_question_is_answered_by_the_general_agent(self):
         sources = [{"id": "web-1", "title": "Canberra - Wikipedia",

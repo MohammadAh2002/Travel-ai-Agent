@@ -22,6 +22,14 @@ class TravelerProfile(BaseModel):
     origin: str | None = None
     gift_heavy: bool = False
     passport_nationality: str | None = None
+    style_asked: bool = False
+    hotel_stars: int | None = None
+    hotel_board: str | None = None
+    hotel_budget: float | None = None
+    hotel_area: str | None = None
+    flight_bags: int | None = None
+    flight_bag_kg: float | None = None
+    flight_time_pref: str | None = None
 
 
 class SessionState(BaseModel):

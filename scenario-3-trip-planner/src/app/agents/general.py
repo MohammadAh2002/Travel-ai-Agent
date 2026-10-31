@@ -5,24 +5,26 @@ from .crew import CrewTaskSpec, SpecialistOutput, run_crew
 
 
 async def answer_general(question: str, history: list[dict] | None = None) -> tuple[str, dict, list[dict]]:
-    """Answer an out-of-scope or general question using live web-search evidence."""
+    """Answer an out-of-scope or general question: live web search first, own knowledge as backup."""
     search = await web_search(question)
-    if not search["results"]:
-        detail = f" ({search['error']})" if search.get("error") else ""
-        return (f"I couldn't retrieve live web results for that{detail}. "
-                "Please rephrase or try again in a moment."), {"cost_usd": None}, []
+    results = search["results"]
     data, usage, roles = await run_crew(
         [CrewTaskSpec(
             "general_agent",
-            "Answer the question using only the supplied live web-search results. "
-            "Cite the sources used as markdown links.",
+            "Answer the question helpfully and directly. Use the supplied live web-search "
+            "results where they are relevant and cite them as markdown links, and fill in the "
+            "rest from your own knowledge. Keep it conversational and concise."
+            if results else
+            "Web search returned nothing for this question, so answer from your own "
+            "knowledge. Add one short note that it could not be checked online just now. "
+            "Never refuse to answer.",
             SpecialistOutput,
         )],
-        {"question": question, "web_results": search["results"],
+        {"question": question, "web_results": results,
          "recent_history": (history or [])[-6:]},
     )
     usage["agents_run"] = roles
     citations = [{"id": f"web-{index + 1}", "title": item.get("title") or item["url"],
                   "url": item["url"]}
-                 for index, item in enumerate(search["results"]) if item.get("url")]
+                 for index, item in enumerate(results) if item.get("url")]
     return data["answer"], usage, citations

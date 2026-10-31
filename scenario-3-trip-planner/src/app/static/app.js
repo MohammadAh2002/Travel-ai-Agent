@@ -271,7 +271,7 @@ function itineraryCard(itinerary) {
           <div class="activity-time">${escapeHTML(item.start_time || "")}</div>
           <div>
             <div class="activity-name">${escapeHTML(item.name)}${item.category ? ` <span class="activity-cat">${escapeHTML(item.category)}</span>` : ""}</div>
-            ${item.description ? `<div class="activity-desc">${escapeHTML(item.description)}</div>` : ""}
+            ${item.description ? `<div class="activity-desc">${escapeHTML(item.description.length > 140 ? `${item.description.slice(0, 140).trimEnd()}…` : item.description)}</div>` : ""}
             <div class="activity-meta">${item.estimated_cost == null ? "Price not listed" : `~${escapeHTML(item.estimated_cost)} ${escapeHTML(itinerary.currency)}`}${item.travel_from_previous_min ? ` · ${escapeHTML(item.travel_from_previous_min)} min walk` : ""}${item.source_url ? ` · <a href="${escapeHTML(item.source_url)}" target="_blank" rel="noopener noreferrer">source ↗</a>` : ""}</div>
           </div>
         </div>`).join("")}
@@ -314,9 +314,11 @@ function approvalSection(pending) {
   row.innerHTML = `
     <div class="summary">${escapeHTML(pending.summary || "Review this action before anything is saved.")}</div>
     <button class="reject" type="button">Not now</button>
+    ${pending.type === "save_trip" ? '<button class="replan" type="button">Reject → new plan</button>' : ""}
     <button class="approve" type="button">Approve &amp; save →</button>`;
-  row.querySelector(".approve").addEventListener("click", () => decide(true, row));
-  row.querySelector(".reject").addEventListener("click", () => decide(false, row));
+  row.querySelector(".approve").addEventListener("click", () => decide("approve", row));
+  row.querySelector(".reject").addEventListener("click", () => decide("dismiss", row));
+  row.querySelector(".replan")?.addEventListener("click", () => decide("replan", row));
   return row;
 }
 function attachApproval(pending, itinerary) {
@@ -334,11 +336,13 @@ function attachApproval(pending, itinerary) {
   state.pendingCard = block;
   scrollThread();
 }
-async function decide(approved, row) {
+async function decide(decision, row) {
   if (!state.pending) return;
   const action = state.pending;
+  const approved = decision === "approve";
+  const replan = decision === "replan" && action.type === "save_trip";
   row.querySelectorAll("button").forEach(button => { button.disabled = true; });
-  addMessage("user", approved ? "Approve and save" : "Not now");
+  addMessage("user", approved ? "Approve and save" : replan ? "Reject — create a different plan" : "Not now");
   try {
     const response = await fetch("/api/approve", {
       method: "POST", headers: { "Content-Type": "application/json" },
@@ -348,9 +352,20 @@ async function decide(approved, row) {
     if (!response.ok) throw new Error(data.detail || "Could not save the plan.");
     state.pending = null;
     state.pendingCard = null;
-    row.innerHTML = `<div class="decision ${approved ? "saved" : "rejected"}">${approved ? `Saved${data.result?.trip_id ? ` as ${escapeHTML(data.result.trip_id)}` : ""} — nothing was booked or paid` : "Rejected — nothing was saved"}</div>`;
+    const decisionText = approved
+      ? `Saved${data.result?.trip_id ? ` as ${escapeHTML(data.result.trip_id)}` : ""} — nothing was booked or paid`
+      : replan ? "Rejected — working on a different plan below" : "Rejected — nothing was saved";
+    row.innerHTML = `<div class="decision ${approved ? "saved" : "rejected"}">${decisionText}</div>`;
     setStatus("Ready when you are", false);
     if (data.reply) addMessage("assistant", data.reply);
+    if (replan) {
+      await sendMessage(
+        "Reject this plan — create a different one",
+        "The traveller rejected the proposed itinerary. Create a new, different itinerary "
+        + "for the same trip: keep the same dates, budget, currency and travellers, but "
+        + "vary the activities, order and neighbourhoods where the sourced listings allow.",
+        false);
+    }
   } catch (error) {
     row.querySelectorAll("button").forEach(button => { button.disabled = false; });
     addMessage("assistant", error.message);
@@ -363,13 +378,15 @@ function renderResponse(data) {
   state.pending = data.pending_action || null;
   const itinerary = state.pending?.payload?.itinerary;
   if (state.pending) attachApproval(state.pending, itinerary?.days?.length ? itinerary : null);
+  const meta = [];
   if (data.agents?.length) {
     const done = data.agents.filter(agent => agent.status === "completed").map(agent => agent.name);
-    if (done.length) addMeta(`Crew: ${done.join(" · ")}`, false);
+    if (done.length) meta.push(`Crew: ${done.join(" · ")}`);
   }
   if (data.tool_calls?.length) {
-    addMeta(`Research trail: ${data.tool_calls.map(tool => `${tool.ok ? "✓" : "!"} ${tool.tool}`).join(" · ")}`, false);
+    meta.push(`tools: ${data.tool_calls.map(tool => `${tool.ok ? "✓" : "!"} ${tool.tool}`).join(" · ")}`);
   }
+  if (meta.length) addMeta(meta.join("  —  "), false);
   if (data.citations?.length) {
     addMeta(`Sources: ${data.citations.slice(0, 4).map(item => `<a target="_blank" rel="noopener noreferrer" href="${escapeHTML(item.url)}">${escapeHTML(item.title || item.id || "source")}</a>`).join(" · ")}`);
   }
@@ -378,11 +395,11 @@ function showResponse(data, conversationId = activeConversation) {
   persistEvent({ type: "response", data }, conversationId);
   if (activeConversation === conversationId) renderResponse(data);
 }
-async function sendMessage(text, requestText = text) {
+async function sendMessage(text, requestText = text, echo = true) {
   if (!text.trim()) return;
   welcome?.remove();
   welcome = null;
-  addMessage("user", text);
+  if (echo) addMessage("user", text);
   const conversationId = activeConversation;
   const sessionId = state.session;
   const sentFlow = state.guidedFlow;

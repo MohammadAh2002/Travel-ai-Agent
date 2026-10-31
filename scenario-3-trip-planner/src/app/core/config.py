@@ -37,3 +37,4 @@ VOICE_LANGUAGE = os.getenv("VOICE_LANGUAGE", "en").strip().lower()
 if VOICE_LANGUAGE in {"", "auto"}:
     VOICE_LANGUAGE = None  # let Whisper auto-detect
 VOICE_ENABLED = os.getenv("VOICE_ENABLED", "true").lower() not in {"0", "false", "no"}
+TAVILY_API_KEY = os.getenv("TAVILY_API_KEY", "")

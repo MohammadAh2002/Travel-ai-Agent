@@ -9,8 +9,9 @@ from pathlib import Path
 from openai import APIConnectionError, APIStatusError, APITimeoutError
 
 from ..agents import (
-    advise_documents, advise_lodging, advise_specialist, answer_general, budget_summary, coordinate,
-    draft_itinerary, research, verify_itinerary,
+    activity_terms, advise_documents, advise_flight, advise_lodging, advise_specialist, answer_general,
+    budget_summary, coordinate, draft_itinerary, normalize_interests, research, unsupported_activities,
+    verify_itinerary, web_activity_ideas,
 )
 from ..core.guardrails import inspect_input, safe_reply
 from ..core.models import ChatRequest
@@ -21,20 +22,24 @@ from ..services import watches
 from ..services.mcp_client import call_tool, connection
 from ..services.memory import get_session, save_session
 from .itinerary import (
-    closure_hints, collect_sources, estimate_routes, price_conflict_notes, sanitize_itinerary,
-    schedule_notes, tool_call, trim_research, verify_costs, verify_selected_hours,
+    closure_hints, collect_sources, estimate_routes, fill_empty_days, price_conflict_notes,
+    repeat_notes, sanitize_itinerary, schedule_notes, tool_call, trim_research, verify_costs,
+    verify_selected_hours,
 )
 
 DOCS = json.loads((Path(__file__).resolve().parent.parent / "data" / "travel_docs.json").read_text(encoding="utf-8"))
 
 OFF_TOPIC_REPLY = (
-    "I'm Rihla, an AI travel-planning assistant — that's the one job I do. I can help with:\n"
+    "I'm Rihla, an AI travel assistant. I can help with:\n"
     "- Multi-day trip itineraries and one-day plans, with sources, a map and cost estimates\n"
     "- Revising a proposed itinerary\n"
     "- Listed-price checks and nearby places around a pin or Google Maps link\n"
     "- Weather and walking-route questions for your trip\n"
+    "- Hotel suggestions matched to your preferences (stars, meals, budget) from live web search\n"
+    "- Flight and baggage advice (how many bags, weight, morning vs night flights)\n"
     "- Travel-document guidance from official government sources\n"
-    "- Pre-travel checklists, remembering your travel preferences, and hourly weather/currency watches\n\n"
+    "- Pre-travel checklists, remembering your travel preferences, and hourly weather/currency watches\n"
+    "- And general questions — I'll answer freely and search the live web when it helps\n\n"
     "What would you like to plan or look up?"
 )
 
@@ -42,18 +47,20 @@ GENERAL_FALLBACK = ("I can help plan an itinerary, find nearby places, check tra
                     "or prepare a pre-trip checklist. What would you like to do?")
 
 
-def update_profile(profile, extracted: dict) -> None:
+def update_profile(profile, extracted: dict, merge_interests: bool = False) -> None:
     scalar = ("destination", "start_date", "end_date", "adults", "children_count", "budget", "currency",
-              "lodging_style", "walking_style", "origin", "gift_heavy", "passport_nationality")
+              "lodging_style", "walking_style", "origin", "gift_heavy", "passport_nationality",
+              "hotel_stars", "hotel_board", "hotel_budget", "hotel_area",
+              "flight_bags", "flight_bag_kg", "flight_time_pref")
     for field in scalar:
         value = extracted.get(field)
         if value is not None:
-            if field in {"adults", "children_count"}:
+            if field in {"adults", "children_count", "hotel_stars", "flight_bags"}:
                 try:
                     value = max(0, int(value))
                 except (TypeError, ValueError):
                     continue
-            elif field == "budget":
+            elif field in {"budget", "hotel_budget", "flight_bag_kg"}:
                 try:
                     value = float(value)
                 except (TypeError, ValueError):
@@ -75,8 +82,12 @@ def update_profile(profile, extracted: dict) -> None:
             profile.children_ages = [int(age) for age in ages if str(age).isdigit() and 0 <= int(age) <= 17]
         profile.children_count = max(profile.children_count, len(profile.children_ages))
     if extracted.get("interests"):
-        profile.interests = extracted["interests"] if isinstance(extracted["interests"], list) \
+        interests = extracted["interests"] if isinstance(extracted["interests"], list) \
             else [x.strip() for x in str(extracted["interests"]).split(",") if x.strip()]
+        if merge_interests:
+            profile.interests = list(dict.fromkeys([*profile.interests, *interests]))
+        else:
+            profile.interests = interests
 
 
 def missing_trip_info(profile, extracted: dict) -> list[str]:
@@ -182,8 +193,8 @@ async def chat_flow(req: ChatRequest) -> dict:
         else:
             reply = str(exc) if isinstance(exc, RuntimeError) else "I couldn't reach the planning model. Please try again."
         return response(reply, state=state.model_dump(), usage=usage_summary())
-    update_profile(state.profile, extracted)
     intent = extracted.get("intent") or "general"
+    update_profile(state.profile, extracted, merge_interests=(intent == "revise"))
     profile = state.profile.model_dump()
 
     if intent in {"itinerary", "day_plan", "revise"}:
@@ -196,6 +207,25 @@ async def chat_flow(req: ChatRequest) -> dict:
             return response(reply, state=state.model_dump(), tool_calls=calls,
                             usage=usage_summary())
         destination = state.profile.destination
+        recent_user_text = " ".join(
+            m["content"] for m in state.history if m.get("role") == "user")[-600:]
+        terms = activity_terms(recent_user_text)
+        unsupported = unsupported_activities(recent_user_text)
+        auto_note = ""
+        if state.profile.start_date and state.profile.end_date:
+            span = (date.fromisoformat(state.profile.end_date) -
+                    date.fromisoformat(state.profile.start_date)).days + 1
+            try:
+                requested = int(extracted.get("days") or 0)
+            except (TypeError, ValueError):
+                requested = 0
+            if 1 <= span < requested <= 14:
+                first = date.fromisoformat(state.profile.start_date)
+                state.profile.end_date = first.fromordinal(first.toordinal() + requested - 1).isoformat()
+                profile = state.profile.model_dump()
+                auto_note = (f"You asked for {requested} days but your dates covered only {span}, so I "
+                             f"planned {requested} days starting {state.profile.start_date} "
+                             f"(say \"use only my dates\" to shorten it).")
         try:
             days = trip_days(state.profile, extracted)
         except ValueError:
@@ -216,6 +246,20 @@ async def chat_flow(req: ChatRequest) -> dict:
             state.last_agents = agents
             save_session(state)
             return response(reply, state=state.model_dump(), usage=usage_summary())
+        if (intent in {"itinerary", "day_plan"} and not state.itinerary
+                and not state.profile.style_asked
+                and not state.profile.interests and not extracted.get("interests")
+                and not extracted.get("target_place") and not activity_terms(req.message)
+                and "saved preferenc" not in req.message.casefold()):
+            state.profile.style_asked = True
+            reply = str(extracted.get("question") or (
+                "Before I draft it: do you want activity-packed sightseeing days, or a more relaxed "
+                "mix with shopping, cafés and free time? And are there any must-do experiences — "
+                "for example a Bosphorus cruise or the cable car?"))
+            state.history.append({"role": "assistant", "content": reply})
+            state.last_agents = agents
+            save_session(state)
+            return response(reply, state=state.model_dump(), usage=usage_summary())
         try:
             async with connection() as mcp:
                 if state.profile.traveller_id != "TRV-GUEST":
@@ -231,15 +275,29 @@ async def chat_flow(req: ChatRequest) -> dict:
                                 profile["saved_dietary"] = saved["dietary"]
                     except Exception:
                         calls.append(tool_call("get_preferences", False, "Researcher"))
-                facts, research_calls = await research(mcp, destination, ", ".join(
-                    state.profile.interests or extracted.get("interests") or []), state.profile.start_date,
-                    state.profile.end_date)
+                extra_queries = []
+                if terms:
+                    extra_queries.append(", ".join(terms))
+                if intent == "revise" and state.itinerary:
+                    previous = [activity["name"] for day in state.itinerary.get("days", [])
+                                for activity in day.get("activities", []) if activity.get("name")]
+                    if previous:
+                        extra_queries.append(", ".join(previous))
+                interests_query = normalize_interests(", ".join(
+                    state.profile.interests or extracted.get("interests") or []))
+                facts, research_calls = await research(mcp, destination, interests_query,
+                    state.profile.start_date, state.profile.end_date, extra_queries=extra_queries)
                 calls.extend(research_calls)
                 agents.append({"name": "Researcher", "status": "completed"})
                 attraction_result = facts.get("find_attractions", {})
                 if attraction_result.get("error"):
-                    reply = ("I couldn't access the attraction data right now, so I won't invent places or propose "
-                             "a plan. Please try again later.")
+                    if "not_cached" in attraction_result["error"]:
+                        reply = (f"I don't have sourced travel data for {destination}: the travel data service "
+                                 "is in replay mode and only covers Istanbul and Amman. Try one of those "
+                                 "cities, or start the gateway with TRAVEL_MODE=live for other destinations.")
+                    else:
+                        reply = ("I couldn't access the attraction data right now, so I won't invent places or propose "
+                                 "a plan. Please try again later.")
                     state.last_agents = agents + [{"name": "Verifier", "status": "blocked"}]
                     state.history.append({"role": "assistant", "content": reply})
                     save_session(state)
@@ -274,6 +332,7 @@ async def chat_flow(req: ChatRequest) -> dict:
                     draft, usage = await draft_itinerary(profile, facts, days, intent=intent)
                     record_usage(usage)
                     agents.extend(specialist_status(usage.get("agents_run", [])))
+                filled_dates = fill_empty_days(proposed, facts, profile, days, verified_costs, draft)
                 route_notes = []
                 if route_estimates:
                     try:
@@ -314,7 +373,38 @@ async def chat_flow(req: ChatRequest) -> dict:
                             usage=usage_summary())
         state.itinerary = proposed
         planned = len(proposed["days"])
-        caveats = []
+        web_citations = []
+        web_note = ""
+        activity_ask = bool(re.search(
+            r"activit|adventure|experience|day trip|outside|something (fun|different)",
+            req.message, re.I))
+        if unsupported or facts.get("find_attractions", {}).get("interest_relaxed") \
+                or (intent == "revise" and activity_ask):
+            idea_query = ", ".join(dict.fromkeys(
+                [*unsupported, *terms, *(extracted.get("interests") or [])])) \
+                or req.message[:120]
+            ideas = await web_activity_ideas(destination, idea_query)
+            if ideas:
+                lines = []
+                for idea in ideas:
+                    web_citations.append({"id": f"web-{len(web_citations) + 1}",
+                                          "title": idea.get("title") or idea["url"],
+                                          "url": idea["url"]})
+                    snippet = (idea.get("snippet") or "").strip()
+                    lines.append(f"- [{idea.get('title') or idea['url']}]({idea['url']})"
+                                 + (f" — {snippet[:120]}" if snippet else ""))
+                web_note = ("From live web search (unverified — outside the sourced plan, confirm "
+                            "details yourself):\n" + "\n".join(lines))
+        caveats = [auto_note] if auto_note else []
+        if unsupported:
+            caveats.append(f"The sourced listings for {destination} don't include {', '.join(unsupported)}, "
+                           "so I couldn't schedule those from verified data — you'd need to arrange them "
+                           "separately.")
+        if filled_dates:
+            caveats.append("I couldn't verify what was planned for "
+                           + ", ".join(filled_dates)
+                           + " in the sourced listings, so I filled that time with other "
+                           "sourced places — tell me if you'd rather leave it free.")
         if planned < days:
             first = date.fromisoformat(state.profile.start_date)
             filled = {day["date"] for day in proposed["days"]}
@@ -352,6 +442,9 @@ async def chat_flow(req: ChatRequest) -> dict:
         closure_notes = schedule_notes(draft, facts, state.profile.start_date, proposed)
         if closure_notes:
             budget_note += " " + " ".join(closure_notes)
+        dropped_repeats = repeat_notes(draft, facts)
+        if dropped_repeats:
+            budget_note += " " + " ".join(dropped_repeats)
         preference_note = (f" I used your saved preferences: {', '.join(profile.get('saved_dietary', []))}."
                            if profile.get("saved_dietary") else "")
         day_lines = []
@@ -362,13 +455,18 @@ async def chat_flow(req: ChatRequest) -> dict:
                 for activity in day["activities"])
             day_lines.append(f"Day {index} ({day['date']}): {stops}.")
         plan_label = f"{days}-day" if planned == days else f"{planned}-day (of {days} requested)"
-        reply = (f"Here is a sourced {plan_label} plan for {destination}. Costs are estimates, and each listed "
-                 f"place links to its source.{preference_note}{budget_note}"
+        reply = (f"Here's a sourced {plan_label} plan for {destination} — costs are estimates "
+                 f"linked to their sources.{preference_note}{budget_note}"
                  + (" " + " ".join(caveats) if caveats else "")
-                 + " Review the itinerary and approve it only if it works for you. Saving stores a plan "
-                   "only; nothing is booked or purchased.\n\n" + "\n".join(day_lines))
-        sources = (collect_sources(facts) + [citation for cost in verified_costs.values()
-                                              for citation in cost.get("citations", []) if citation.get("url")] +
+                 + " Approve it to save the plan; nothing is booked or purchased. "
+                 + "Want changes? Tell me things like \"add a Bosphorus cruise\", \"add the cable car\", "
+                 + "\"more shopping, fewer museums\" or \"make day 1 cheaper\".\n\n"
+                 + "\n".join(day_lines))
+        if web_note:
+            reply += "\n\n" + web_note
+        sources = (collect_sources(facts) + web_citations +
+                   [citation for cost in verified_costs.values()
+                    for citation in cost.get("citations", []) if citation.get("url")] +
                    [route.get("citation") for route in route_estimates.values()
                     if route.get("citation") and route["citation"].get("url")])
         state.last_sources = sources
@@ -410,6 +508,27 @@ async def chat_flow(req: ChatRequest) -> dict:
 
     if intent == "lodging":
         agents.append({"name": "Lodging Advisor", "status": "working"})
+        destination = state.profile.destination or extracted.get("destination")
+        style_known = bool(state.profile.lodging_style) or state.profile.hotel_stars is not None
+        board_known = bool(state.profile.hotel_board)
+        if not destination or not (style_known and board_known):
+            if not destination:
+                reply = ("Which city are you staying in? Also tell me how many stars you want "
+                         "(or budget / mid-range / luxury) and which meals — breakfast only, "
+                         "half-board or all-inclusive.")
+            else:
+                needs = []
+                if not style_known:
+                    needs.append("how many stars (or budget / mid-range / luxury)")
+                if not board_known:
+                    needs.append("which meals — breakfast only, half-board or all-inclusive")
+                reply = ("To search the web for hotels that fit you, tell me: " + " and ".join(needs)
+                         + f". Optionally also a max price per night and a preferred area in {destination}.")
+            agents[-1]["status"] = "completed"
+            state.last_agents = agents
+            state.history.append({"role": "assistant", "content": reply})
+            save_session(state)
+            return response(reply, state=state.model_dump(), usage=usage_summary())
         try:
             reply, usage, sources = await advise_lodging(req.message, profile, state.history)
             record_usage(usage)
@@ -440,11 +559,16 @@ async def chat_flow(req: ChatRequest) -> dict:
                     "end_date": state.profile.end_date or extracted.get("end_date") or start,
                 })
             calls.append(tool_call("get_weather", True, "Weather Analyst"))
-        except Exception:
+        except Exception as exc:
             calls.append(tool_call("get_weather", False, "Weather Analyst"))
+            err = str(exc)
             data = None
         if data is None:
-            reply = "I couldn't retrieve reliable weather information for those dates, so I won't guess. Please try again later."
+            if "not_cached" in err:
+                reply = (f"I don't have weather data for {city}: the travel data service is in replay "
+                         "mode and only covers Istanbul and Amman.")
+            else:
+                reply = "I couldn't retrieve reliable weather information for those dates, so I won't guess. Please try again later."
             sources = []
         else:
             try:
@@ -635,6 +759,37 @@ async def chat_flow(req: ChatRequest) -> dict:
         save_session(state)
         return response(reply, state=state.model_dump(), pending=pending)
 
+    if intent == "flight":
+        agents.append({"name": "Flight Advisor", "status": "working"})
+        origin = state.profile.origin or extracted.get("origin")
+        needs = []
+        if not origin:
+            needs.append("which city you are flying from")
+        if state.profile.flight_bags is None:
+            needs.append("how many checked bags you want to take and roughly how many kg each")
+        if not state.profile.flight_time_pref:
+            needs.append("whether you prefer morning, afternoon or night flights — or it doesn't matter")
+        if needs:
+            reply = "To advise on flights and baggage, tell me: " + "; ".join(needs) + "?"
+            agents[-1]["status"] = "completed"
+            state.last_agents = agents
+            state.history.append({"role": "assistant", "content": reply})
+            save_session(state)
+            return response(reply, state=state.model_dump(), usage=usage_summary())
+        try:
+            reply, usage, sources = await advise_flight(req.message, profile, state.history)
+            record_usage(usage)
+        except Exception:
+            reply = ("I couldn't look up flight and baggage information right now. Please confirm exact "
+                     "baggage rules and fares on the airline's website — I can't see live fares or book tickets.")
+            sources = []
+        agents[-1]["status"] = "completed"
+        state.last_agents = agents
+        state.last_sources = sources
+        state.history.append({"role": "assistant", "content": reply})
+        save_session(state)
+        return response(reply, state=state.model_dump(), citations=sources, usage=usage_summary())
+
     if intent in {"general", "off_topic"}:
         agents.append({"name": "General Agent", "status": "working"})
         try:
@@ -656,7 +811,7 @@ async def chat_flow(req: ChatRequest) -> dict:
         reply = "Before you travel:\n" + "\n".join(f"- {item}" for item in items)
         agents.append({"name": "Travel Prep Advisor", "status": "completed"})
     else:
-        reply = str(extracted.get("question") or GENERAL_FALLBACK)
+        reply = GENERAL_FALLBACK
         agents.append({"name": "Coordinator", "status": "completed"})
     state.last_agents = agents
     state.history.append({"role": "assistant", "content": reply})

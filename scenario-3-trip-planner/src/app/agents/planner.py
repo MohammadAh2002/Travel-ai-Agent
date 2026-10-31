@@ -15,7 +15,7 @@ async def draft_itinerary(profile: dict, facts: dict, days: int,
     tasks = [
         CrewTaskSpec(
             "place_researcher",
-            "Review the MCP evidence and the traveller's current request. Return exact matching candidate place names from the evidence, prioritizing explicitly requested places, plus concise source, closure, or price caveats.",
+            f"Review the MCP evidence and the traveller's current request. Return exact candidate place names from the evidence — explicitly requested places first, then other sourced places that suit the traveller — enough distinct candidates to fill {days} day(s), plus concise source, closure, or price caveats.",
             PlaceResearchOutput,
         ),
         CrewTaskSpec(

@@ -70,7 +70,7 @@ The eval runner can write a scorecard with `--out evals/scorecard.md`. It calls 
 | Measure | Status |
 |---|---|
 | Kit API/MCP smoke test | Passed in this workspace |
-| Local unit tests | 23 passed |
+| Local unit tests | 37 passed |
 | Kit sample cases | Not run in this verification session |
 | Additional cases | Not run in this verification session |
 | Before/after fix | Before: an LLM draft could include unsupported place names or a listing-closed weekday. After: code keeps only MCP-returned places, replaces source URLs from those tool results, queries opening hours for selected stops, and filters closed-day/timing conflicts before the approval proposal. |
@@ -142,7 +142,7 @@ See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the full request flow, and [`SUMMAR
 - Nearby distance is a straight-line walking-time estimate, not routed navigation. This data kit has no pharmacy listings.
 - Visa and entry rules depend on passport nationality, trip purpose, transit and travel dates. The advisor is informational, not legal advice; confirm uncertain cases with the relevant embassy or consulate.
 - Watches can check the gateway's weather/FX data. No hotel or flight pricing feed exists.
-- The Lodging Advisor suggests hotels found via live web search (clearly marked unverified, with source links) and can use hotel details the traveller provides to reason about itinerary impact. It cannot check live rates or availability or book hotels — no hotel inventory API exists.
+- The Lodging Advisor recommends specific hotels using live web-search results (with source links); when results are thin it may also name well-known hotels in the requested area from the model's knowledge. All suggestions are marked unverified — it never invents prices, ratings or amenities, and cannot check live rates, availability, or book hotels — no hotel inventory API exists.
 - Session state and watches live in process memory and clear on restart. Production deployment should use durable storage and a managed scheduler.
 - Voice requires microphone permission and a compatible faster-whisper install; normal text chat still works without voice.
 

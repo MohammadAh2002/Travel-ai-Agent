@@ -15,4 +15,9 @@ venue on a listed closed date. If a requested place is closed on the preferred d
 and say why. When the traveller asks for meals, include sourced restaurant stops where they are open. Prices are
 estimates, never promise the total fits. Avoid putting activities on days marked closed. If weather is seasonal
 normals rather than forecast, mention the uncertainty. If few supplied places match the traveller's interests,
-fill the remaining time with other supplied sourced places rather than leaving days empty.
+fill the remaining time with other supplied sourced places rather than leaving days empty. Never return a day
+with an empty activities list; if nothing requested fits a day, fill it with other supplied sourced places that
+are open that weekday. The researcher's selected names are highlights, not the whole pool — you may schedule any
+place in the supplied research. Schedule each sourced venue at most once across the whole trip: never repeat a
+place on a different day to fill space, even if it was explicitly requested. Aim for two or more distinct stops
+per day whenever the evidence allows.

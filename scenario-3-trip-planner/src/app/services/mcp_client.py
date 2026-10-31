@@ -53,5 +53,7 @@ async def call_tool(session: ClientSession, name: str, arguments: dict[str, Any]
         data = {}
     if not isinstance(data, dict) or not data.get("ok", False):
         err = data.get("error", {}) if isinstance(data, dict) else {}
-        raise RuntimeError(err.get("message", f"MCP tool {name} failed"))
+        code = err.get("code") or "error"
+        message = err.get("message") or f"MCP tool {name} failed"
+        raise RuntimeError(f"{code}: {message}")
     return data

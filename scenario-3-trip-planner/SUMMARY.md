@@ -64,7 +64,7 @@ scenario-3-trip-planner/
 
 Every CrewAI role has its own Markdown file under `src/app/agents/skills/<role>.md`. Each file contains a
 small front-matter block (`role`, `goal`, `backstory` — the CrewAI `Agent` identity) followed by the
-skill body: that role's standing rules (e.g. *never invent places*, *no hotel inventory exists*,
+skill body: that role's standing rules (e.g. *never invent places*, *hotel suggestions are unverified*,
 *distinguish forecasts from seasonal normals*). At startup `crew.py` parses all ten files into
 `ROLE_SPECS`; when a task runs, the matching skill body is automatically prepended to the task-specific
 instructions, so a role always works from its own written skill. To change an agent's behaviour you edit
