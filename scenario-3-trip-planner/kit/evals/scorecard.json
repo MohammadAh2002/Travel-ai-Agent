@@ -1,0 +1,1549 @@
+{
+ "summary": {
+  "cases_file": "evals\\cases.sample.jsonl",
+  "runs": 10,
+  "passed": 10,
+  "pass_rate": 1.0,
+  "turn_latency_avg_s": 11.69,
+  "turn_latency_p95_s": 30.74,
+  "cost_usd_reported": null,
+  "by_category": {
+   "clarification": "1/1",
+   "conflict": "2/2",
+   "guardrail": "1/1",
+   "happy_path": "2/2",
+   "memory": "1/1",
+   "rejection": "1/1",
+   "revision": "1/1",
+   "tool_failure": "1/1"
+  },
+  "wall_time_s": 187.2
+ },
+ "results": [
+  {
+   "id": "S3-01",
+   "category": "happy_path",
+   "passed": true,
+   "checks": [
+    {
+     "check": "reply_contains_any",
+     "ok": true,
+     "detail": "wanted one of ['estimate', 'approx', 'about']"
+    },
+    {
+     "check": "reply_contains_all",
+     "ok": true,
+     "detail": "missing []"
+    },
+    {
+     "check": "pending_action",
+     "ok": true,
+     "detail": "expected save_trip, got save_trip"
+    },
+    {
+     "check": "result_absent",
+     "ok": true,
+     "detail": "expected no result, got {}"
+    },
+    {
+     "check": "citations_min",
+     "ok": true,
+     "detail": "18 citations"
+    },
+    {
+     "check": "tools_used_include",
+     "ok": true,
+     "detail": "never called [] (saw ['convert_currency', 'find_attractions', 'find_restaurants', 'get_opening_hours', 'get_preferences', 'get_weather', 'travel_time'])"
+    },
+    {
+     "check": "max_latency_s",
+     "ok": true,
+     "detail": "slowest turn 17.2s"
+    },
+    {
+     "check": "state trips",
+     "ok": true,
+     "detail": "0 records, expected 0"
+    },
+    {
+     "check": "judge",
+     "ok": null,
+     "detail": "skipped (run with --judge)"
+    }
+   ],
+   "turns": [
+    {
+     "turn": {
+      "say": "Plan a 3-day trip to Istanbul from 2026-11-02 to 2026-11-04 for 1 traveller. Total budget 700 USD for activities, food and local transport (my hotel is already paid). I like historical sites, local restaurants and nature."
+     },
+     "seconds": 17.24,
+     "status": 200,
+     "reply": "Here is a sourced 3-day plan for Istanbul. Costs are estimates, and each listed place links to its source. Known listed costs are about 124.32 USD against your 700.0 USD budget. Unpriced expenses are not included, so this is not a guarantee the full trip fits. Topkapı Palace was moved off Tue, when its listing says it is closed. Review the itinerary and approve it only if it works for you. Saving stores a plan only; nothing is booked or purchased.\n\nDay 1 (2026-11-02): 09:00 Hagia Sophia, 11:30 Basilica Cistern, 14:00 Museum of Archaeology, 17:00 Sokollu Mehmet Pasha Mosque.\nDay 2 (2026-11-03): 13:30 Museum of the History of Science and Technology in Islam, 15:30 Theodosius Cistern.\nDay 3 (2026-11-04): 10:00 Istanbul Railway Museum, 12:00 Süleymaniye Mosque, 14:00 Fatih Mosque, 16:00 Topkap",
+     "transcript": null,
+     "pending_action": {
+      "action_id": "act-684459ab07234d96bc95ee7d37e15fa5",
+      "type": "save_trip",
+      "summary": "Save Istanbul, 3 day(s), estimated 124.32 USD for 1 traveller(s)",
+      "payload": {
+       "traveller_id": "TRV-200",
+       "title": "Istanbul, 3 day(s)",
+       "itinerary": {
+        "destination": "Istanbul",
+        "currency": "USD",
+        "travellers": 1,
+        "budget_total": 700.0,
+        "estimated_total": 124.32,
+        "days": [
+         {
+          "date": "2026-11-02",
+          "activities": [
+           {
+            "name": "Hagia Sophia",
+            "start_time": "09:00",
+            "end_time": "11:00",
+            "estimated_cost": 27.98,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0085,
+            "lon": 28.9799,
+            "travel_from_previous_min": null,
+            "route_source_url": null,
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           },
+           {
+            "name": "Basilica Cistern",
+            "start_time": "11:30",
+            "end_time": "13:00",
+            "estimated_cost": null,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0081,
+            "lon": 28.9778,
+            "travel_from_previous_min": 3,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97990,41.00850;28.97780,41.00810?overview=false",
+            "notes": "Sources disagree about the listed price; confirm it before travel."
+           },
+           {
+            "name": "Museum of Archaeology",
+            "start_time": "14:00",
+            "end_time": "16:30",
+            "estimated_cost": 16.79,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0107,
+            "lon": 28.9812,
+            "travel_from_previous_min": 8,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97780,41.00810;28.98120,41.01070?overview=false",
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           },
+           {
+            "name": "Sokollu Mehmet Pasha Mosque",
+            "start_time": "17:00",
+            "end_time": "18:00",
+            "estimated_cost": null,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0048,
+            "lon": 28.9721,
+            "travel_from_previous_min": 17,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.98120,41.01070;28.97210,41.00480?overview=false",
+            "notes": "No usable price was listed; verify costs before travel."
+           }
+          ]
+         },
+         {
+          "date": "2026-11-03",
+          "activities": [
+           {
+            "name": "Museum of the History of Science and Technology in Islam",
+            "start_time": "13:30",
+            "end_time": "15:00",
+            "estimated_cost": 11.19,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0138,
+            "lon": 28.9796,
+            "travel_from_previous_min": 15,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.98400,41.01300;28.97960,41.01380?overview=false",
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           },
+           {
+            "name": "Theodosius Cistern",
+            "start_time": "15:30",
+            "end_time": "17:00",
+            "estimated_cost": 13.07,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0073,
+            "lon": 28.9726,
+            "travel_from_previous_min": 14,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97960,41.01380;28.97260,41.00730?overview=false",
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           }
+          ]
+         },
+         {
+          "date": "2026-11-04",
+          "activities": [
+           {
+            "name": "Istanbul Railway Museum",
+            "start_time": "10:00",
+            "end_time": "11:30",
+            "estimated_cost": null,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.015278,
+            "lon": 28.977222,
+            "travel_from_previous_min": null,
+            "route_source_url": null,
+            "notes": "No usable price was listed; verify costs before travel."
+           },
+           {
+            "name": "Süleymaniye Mosque",
+            "start_time": "12:00",
+            "end_time": "13:30",
+            "estimated_cost": null,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0161,
+            "lon": 28.9639,
+            "travel_from_previous_min": 19,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97722,41.01528;28.96390,41.01610?overview=false",
+            "notes": "No usable price was listed; verify costs before travel."
+           },
+           {
+            "name": "Fatih Mosque",
+            "start_time": "14:00",
+            "end_time": "15:30",
+            "estimated_cost": null,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0197,
+            "lon": 28.9497,
+            "travel_from_previous_min": 22,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.96390,41.01610;28.94970,41.01970?overview=false",
+            "notes": "No usable price was listed; verify costs before travel."
+           },
+           {
+            "name": "Topkapı Palace",
+            "start_time": "16:00",
+            "end_time": "17:00",
+            "estimated_cost": 55.29,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.013,
+            "lon": 28.984,
+            "travel_from_previous_min": null,
+            "route_source_url": null,
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ. Rescheduled from 2026-11-03 because the listing marks the venue closed that day."
+           }
+          ]
+         }
+        ],
+        "party_note": "Traveller: Karim Saleh"
+       }
+      }
+     },
+     "result": null,
+     "citations": [
+      "WIKIVOYAGE",
+      "WV-ISTANBUL-YEDIKULE-FORTRESS",
+      "WV-ISTANBUL-CAGALOGLU-HAMAMI",
+      "WV-ISTANBUL-GRAND-BAZAAR",
+      "WV-ISTANBUL-KORECAN",
+      "OPEN-METEO FORECAST API",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "OSRM-FOOT-HAGIA-SOPHIA-BASILICA-CISTERN",
+      "OSRM-FOOT-BASILICA-CISTERN-MUSEUM-OF-ARCHAEOLOGY",
+      "OSRM-FOOT-MUSEUM-OF-ARCHAEOLOGY-SOKOLLU-MEHMET-PASHA-MOSQUE",
+      "OSRM-FOOT-TOPKAPI-PALACE-MUSEUM-OF-THE-HISTORY-OF-SCIENCE-AND-TECHNOLOGY-IN-ISLAM",
+      "OSRM-FOOT-MUSEUM-OF-THE-HISTORY-OF-SCIENCE-AND-TECHNOLOGY-IN-ISLAM-THEODOSIUS-CISTERN",
+      "OSRM-FOOT-ISTANBUL-RAILWAY-MUSEUM-SULEYMANIYE-MOSQUE",
+      "OSRM-FOOT-SULEYMANIYE-MOSQUE-FATIH-MOSQUE"
+     ]
+    }
+   ],
+   "latencies": [
+    17.24
+   ],
+   "cost_usd": 0.0,
+   "error": null
+  },
+  {
+   "id": "S3-02",
+   "category": "happy_path",
+   "passed": true,
+   "checks": [
+    {
+     "check": "reply_contains_any",
+     "ok": true,
+     "detail": "wanted one of ['TRIP-3']"
+    },
+    {
+     "check": "pending_action",
+     "ok": true,
+     "detail": "expected none, got None"
+    },
+    {
+     "check": "result_has",
+     "ok": true,
+     "detail": "result is missing []"
+    },
+    {
+     "check": "state trips",
+     "ok": true,
+     "detail": "1 records, expected 1"
+    },
+    {
+     "check": "state trips",
+     "ok": true,
+     "detail": "no record matches {'traveller_id': 'TRV-200', 'start_date': '2026-11-05', 'end_date': '2026-11-06'}"
+    }
+   ],
+   "turns": [
+    {
+     "turn": {
+      "say": "Plan 2 days in Istanbul, 2026-11-05 to 2026-11-06, for 1 traveller, total budget 300 USD. I like history and local food."
+     },
+     "seconds": 30.74,
+     "status": 200,
+     "reply": "Here is a sourced 2-day plan for Istanbul. Costs are estimates, and each listed place links to its source. Known listed costs are about 111.25 USD against your 300.0 USD budget. Unpriced expenses are not included, so this is not a guarantee the full trip fits. Review the itinerary and approve it only if it works for you. Saving stores a plan only; nothing is booked or purchased.\n\nDay 1 (2026-11-05): 09:00 Hagia Sophia, 11:30 Basilica Cistern, 14:00 Museum of Archaeology.\nDay 2 (2026-11-06): 09:30 Topkapı Palace, 13:30 Museum of the History of Science and Technology in Islam.",
+     "transcript": null,
+     "pending_action": {
+      "action_id": "act-7d271c6caa894e7e9fa2a8aeab7f2e1e",
+      "type": "save_trip",
+      "summary": "Save Istanbul, 2 day(s), estimated 111.25 USD for 1 traveller(s)",
+      "payload": {
+       "traveller_id": "TRV-200",
+       "title": "Istanbul, 2 day(s)",
+       "itinerary": {
+        "destination": "Istanbul",
+        "currency": "USD",
+        "travellers": 1,
+        "budget_total": 300.0,
+        "estimated_total": 111.25,
+        "days": [
+         {
+          "date": "2026-11-05",
+          "activities": [
+           {
+            "name": "Hagia Sophia",
+            "start_time": "09:00",
+            "end_time": "11:00",
+            "estimated_cost": 27.98,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0085,
+            "lon": 28.9799,
+            "travel_from_previous_min": null,
+            "route_source_url": null,
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           },
+           {
+            "name": "Basilica Cistern",
+            "start_time": "11:30",
+            "end_time": "13:00",
+            "estimated_cost": null,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0081,
+            "lon": 28.9778,
+            "travel_from_previous_min": 3,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97990,41.00850;28.97780,41.00810?overview=false",
+            "notes": "Sources disagree about the listed price; confirm it before travel."
+           },
+           {
+            "name": "Museum of Archaeology",
+            "start_time": "14:00",
+            "end_time": "16:30",
+            "estimated_cost": 16.79,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0107,
+            "lon": 28.9812,
+            "travel_from_previous_min": 8,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97780,41.00810;28.98120,41.01070?overview=false",
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           }
+          ]
+         },
+         {
+          "date": "2026-11-06",
+          "activities": [
+           {
+            "name": "Topkapı Palace",
+            "start_time": "09:30",
+            "end_time": "12:30",
+            "estimated_cost": 55.29,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.013,
+            "lon": 28.984,
+            "travel_from_previous_min": null,
+            "route_source_url": null,
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           },
+           {
+            "name": "Museum of the History of Science and Technology in Islam",
+            "start_time": "13:30",
+            "end_time": "15:00",
+            "estimated_cost": 11.19,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0138,
+            "lon": 28.9796,
+            "travel_from_previous_min": 15,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.98400,41.01300;28.97960,41.01380?overview=false",
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           }
+          ]
+         }
+        ],
+        "party_note": "Traveller: Karim Saleh"
+       }
+      }
+     },
+     "result": null,
+     "citations": [
+      "WIKIVOYAGE",
+      "WV-ISTANBUL-YEDIKULE-FORTRESS",
+      "WV-ISTANBUL-CAGALOGLU-HAMAMI",
+      "WV-ISTANBUL-GRAND-BAZAAR",
+      "WV-ISTANBUL-KORECAN",
+      "OPEN-METEO FORECAST API",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "OSRM-FOOT-HAGIA-SOPHIA-BASILICA-CISTERN",
+      "OSRM-FOOT-BASILICA-CISTERN-MUSEUM-OF-ARCHAEOLOGY",
+      "OSRM-FOOT-TOPKAPI-PALACE-MUSEUM-OF-THE-HISTORY-OF-SCIENCE-AND-TECHNOLOGY-IN-ISLAM",
+      "OSRM-FOOT-MUSEUM-OF-THE-HISTORY-OF-SCIENCE-AND-TECHNOLOGY-IN-ISLAM-SULEYMANIYE-MOSQUE"
+     ]
+    },
+    {
+     "turn": {
+      "approve": true
+     },
+     "seconds": 1.02,
+     "status": 200,
+     "reply": "Saved as TRIP-3001. Nothing was booked, reserved, or paid.",
+     "transcript": null,
+     "pending_action": null,
+     "result": {
+      "trip_id": "TRIP-3001"
+     },
+     "citations": [
+      "WIKIVOYAGE",
+      "WV-ISTANBUL-YEDIKULE-FORTRESS",
+      "WV-ISTANBUL-CAGALOGLU-HAMAMI",
+      "WV-ISTANBUL-GRAND-BAZAAR",
+      "WV-ISTANBUL-KORECAN",
+      "OPEN-METEO FORECAST API",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "OSRM-FOOT-HAGIA-SOPHIA-BASILICA-CISTERN",
+      "OSRM-FOOT-BASILICA-CISTERN-MUSEUM-OF-ARCHAEOLOGY",
+      "OSRM-FOOT-TOPKAPI-PALACE-MUSEUM-OF-THE-HISTORY-OF-SCIENCE-AND-TECHNOLOGY-IN-ISLAM",
+      "OSRM-FOOT-MUSEUM-OF-THE-HISTORY-OF-SCIENCE-AND-TECHNOLOGY-IN-ISLAM-SULEYMANIYE-MOSQUE"
+     ]
+    }
+   ],
+   "latencies": [
+    30.74,
+    1.02
+   ],
+   "cost_usd": 0.0,
+   "error": null
+  },
+  {
+   "id": "S3-03",
+   "category": "rejection",
+   "passed": true,
+   "checks": [
+    {
+     "check": "reply_not_contains",
+     "ok": true,
+     "detail": "must not say []"
+    },
+    {
+     "check": "pending_action",
+     "ok": true,
+     "detail": "expected none, got None"
+    },
+    {
+     "check": "result_absent",
+     "ok": true,
+     "detail": "expected no result, got {}"
+    },
+    {
+     "check": "state trips",
+     "ok": true,
+     "detail": "0 records, expected 0"
+    }
+   ],
+   "turns": [
+    {
+     "turn": {
+      "say": "Plan 2 days in Istanbul, 2026-11-05 to 2026-11-06, for 1 traveller, total budget 300 USD. I like history and local food."
+     },
+     "seconds": 16.02,
+     "status": 200,
+     "reply": "Here is a sourced 2-day plan for Istanbul. Costs are estimates, and each listed place links to its source. Known listed costs are about 124.32 USD against your 300.0 USD budget. Unpriced expenses are not included, so this is not a guarantee the full trip fits. Review the itinerary and approve it only if it works for you. Saving stores a plan only; nothing is booked or purchased.\n\nDay 1 (2026-11-05): 09:00 Hagia Sophia, 11:30 Basilica Cistern, 14:00 Museum of Archaeology.\nDay 2 (2026-11-06): 09:30 Topkapı Palace, 13:30 Museum of the History of Science and Technology in Islam, 15:30 Theodosius Cistern.",
+     "transcript": null,
+     "pending_action": {
+      "action_id": "act-4f2bbda81fe946448ea07e2e68f64739",
+      "type": "save_trip",
+      "summary": "Save Istanbul, 2 day(s), estimated 124.32 USD for 1 traveller(s)",
+      "payload": {
+       "traveller_id": "TRV-200",
+       "title": "Istanbul, 2 day(s)",
+       "itinerary": {
+        "destination": "Istanbul",
+        "currency": "USD",
+        "travellers": 1,
+        "budget_total": 300.0,
+        "estimated_total": 124.32,
+        "days": [
+         {
+          "date": "2026-11-05",
+          "activities": [
+           {
+            "name": "Hagia Sophia",
+            "start_time": "09:00",
+            "end_time": "11:00",
+            "estimated_cost": 27.98,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0085,
+            "lon": 28.9799,
+            "travel_from_previous_min": null,
+            "route_source_url": null,
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           },
+           {
+            "name": "Basilica Cistern",
+            "start_time": "11:30",
+            "end_time": "13:00",
+            "estimated_cost": null,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0081,
+            "lon": 28.9778,
+            "travel_from_previous_min": 3,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97990,41.00850;28.97780,41.00810?overview=false",
+            "notes": "Sources disagree about the listed price; confirm it before travel."
+           },
+           {
+            "name": "Museum of Archaeology",
+            "start_time": "14:00",
+            "end_time": "16:30",
+            "estimated_cost": 16.79,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0107,
+            "lon": 28.9812,
+            "travel_from_previous_min": 8,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97780,41.00810;28.98120,41.01070?overview=false",
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           }
+          ]
+         },
+         {
+          "date": "2026-11-06",
+          "activities": [
+           {
+            "name": "Topkapı Palace",
+            "start_time": "09:30",
+            "end_time": "12:30",
+            "estimated_cost": 55.29,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.013,
+            "lon": 28.984,
+            "travel_from_previous_min": null,
+            "route_source_url": null,
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           },
+           {
+            "name": "Museum of the History of Science and Technology in Islam",
+            "start_time": "13:30",
+            "end_time": "15:00",
+            "estimated_cost": 11.19,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0138,
+            "lon": 28.9796,
+            "travel_from_previous_min": 15,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.98400,41.01300;28.97960,41.01380?overview=false",
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           },
+           {
+            "name": "Theodosius Cistern",
+            "start_time": "15:30",
+            "end_time": "17:00",
+            "estimated_cost": 13.07,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0073,
+            "lon": 28.9726,
+            "travel_from_previous_min": 14,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97960,41.01380;28.97260,41.00730?overview=false",
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           }
+          ]
+         }
+        ],
+        "party_note": "Traveller: Karim Saleh"
+       }
+      }
+     },
+     "result": null,
+     "citations": [
+      "WIKIVOYAGE",
+      "WV-ISTANBUL-YEDIKULE-FORTRESS",
+      "WV-ISTANBUL-CAGALOGLU-HAMAMI",
+      "WV-ISTANBUL-GRAND-BAZAAR",
+      "WV-ISTANBUL-KORECAN",
+      "OPEN-METEO FORECAST API",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "OSRM-FOOT-HAGIA-SOPHIA-BASILICA-CISTERN",
+      "OSRM-FOOT-BASILICA-CISTERN-MUSEUM-OF-ARCHAEOLOGY",
+      "OSRM-FOOT-MUSEUM-OF-ARCHAEOLOGY-SULEYMANIYE-MOSQUE",
+      "OSRM-FOOT-TOPKAPI-PALACE-MUSEUM-OF-THE-HISTORY-OF-SCIENCE-AND-TECHNOLOGY-IN-ISLAM",
+      "OSRM-FOOT-MUSEUM-OF-THE-HISTORY-OF-SCIENCE-AND-TECHNOLOGY-IN-ISLAM-THEODOSIUS-CISTERN"
+     ]
+    },
+    {
+     "turn": {
+      "approve": false
+     },
+     "seconds": 0.0,
+     "status": 200,
+     "reply": "Rejected. Nothing was saved, booked, reserved, or paid.",
+     "transcript": null,
+     "pending_action": null,
+     "result": null,
+     "citations": []
+    }
+   ],
+   "latencies": [
+    16.02,
+    0.0
+   ],
+   "cost_usd": 0.0,
+   "error": null
+  },
+  {
+   "id": "S3-04",
+   "category": "revision",
+   "passed": true,
+   "checks": [
+    {
+     "check": "result_has",
+     "ok": true,
+     "detail": "result is missing []"
+    },
+    {
+     "check": "state trips",
+     "ok": true,
+     "detail": "1 records, expected 1"
+    },
+    {
+     "check": "state trips",
+     "ok": true,
+     "detail": "no record matches {'budget_total': 560, 'within_budget': True}"
+    },
+    {
+     "check": "judge",
+     "ok": null,
+     "detail": "skipped (run with --judge)"
+    }
+   ],
+   "turns": [
+    {
+     "turn": {
+      "say": "Plan 3 days in Istanbul from 2026-11-02 to 2026-11-04 for 1 traveller, total budget 700 USD. I like history and local food."
+     },
+     "seconds": 17.58,
+     "status": 200,
+     "reply": "I couldn't access the trip research tools (ExceptionGroup). I won't make up travel facts.",
+     "transcript": null,
+     "pending_action": null,
+     "result": null,
+     "citations": []
+    },
+    {
+     "turn": {
+      "say": "Please cut the budget by 20% and revise the plan. Same dates."
+     },
+     "seconds": 34.95,
+     "status": 200,
+     "reply": "Here is a sourced 3-day plan for Istanbul. Costs are estimates, and each listed place links to its source. Known listed costs are about 124.32 USD against your 560.0 USD budget. Unpriced expenses are not included, so this is not a guarantee the full trip fits. Review the itinerary and approve it only if it works for you. Saving stores a plan only; nothing is booked or purchased.\n\nDay 1 (2026-11-02): 09:00 Hagia Sophia, 11:30 Basilica Cistern, 14:00 Topkapı Palace.\nDay 2 (2026-11-03): 09:30 Museum of Archaeology, 13:30 Museum of the History of Science and Technology in Islam.\nDay 3 (2026-11-04): 10:00 Istanbul Railway Museum, 12:00 Theodosius Cistern, 14:30 Sokollu Mehmet Pasha Mosque.",
+     "transcript": null,
+     "pending_action": {
+      "action_id": "act-a6662044912042d0b577aa92ca00e17b",
+      "type": "save_trip",
+      "summary": "Save Istanbul, 3 day(s), estimated 124.32 USD for 1 traveller(s)",
+      "payload": {
+       "traveller_id": "TRV-200",
+       "title": "Istanbul, 3 day(s)",
+       "itinerary": {
+        "destination": "Istanbul",
+        "currency": "USD",
+        "travellers": 1,
+        "budget_total": 560.0,
+        "estimated_total": 124.32,
+        "days": [
+         {
+          "date": "2026-11-02",
+          "activities": [
+           {
+            "name": "Hagia Sophia",
+            "start_time": "09:00",
+            "end_time": "11:00",
+            "estimated_cost": 27.98,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0085,
+            "lon": 28.9799,
+            "travel_from_previous_min": null,
+            "route_source_url": null,
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           },
+           {
+            "name": "Basilica Cistern",
+            "start_time": "11:30",
+            "end_time": "13:00",
+            "estimated_cost": null,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0081,
+            "lon": 28.9778,
+            "travel_from_previous_min": 3,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97990,41.00850;28.97780,41.00810?overview=false",
+            "notes": "Sources disagree about the listed price; confirm it before travel."
+           },
+           {
+            "name": "Topkapı Palace",
+            "start_time": "14:00",
+            "end_time": "17:00",
+            "estimated_cost": 55.29,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.013,
+            "lon": 28.984,
+            "travel_from_previous_min": 14,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97780,41.00810;28.98400,41.01300?overview=false",
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           }
+          ]
+         },
+         {
+          "date": "2026-11-03",
+          "activities": [
+           {
+            "name": "Museum of Archaeology",
+            "start_time": "09:30",
+            "end_time": "12:00",
+            "estimated_cost": 16.79,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0107,
+            "lon": 28.9812,
+            "travel_from_previous_min": null,
+            "route_source_url": null,
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           },
+           {
+            "name": "Museum of the History of Science and Technology in Islam",
+            "start_time": "13:30",
+            "end_time": "15:30",
+            "estimated_cost": 11.19,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0138,
+            "lon": 28.9796,
+            "travel_from_previous_min": 8,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.98120,41.01070;28.97960,41.01380?overview=false",
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           }
+          ]
+         },
+         {
+          "date": "2026-11-04",
+          "activities": [
+           {
+            "name": "Istanbul Railway Museum",
+            "start_time": "10:00",
+            "end_time": "11:30",
+            "estimated_cost": null,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.015278,
+            "lon": 28.977222,
+            "travel_from_previous_min": null,
+            "route_source_url": null,
+            "notes": "No usable price was listed; verify costs before travel."
+           },
+           {
+            "name": "Theodosius Cistern",
+            "start_time": "12:00",
+            "end_time": "13:30",
+            "estimated_cost": 13.07,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0073,
+            "lon": 28.9726,
+            "travel_from_previous_min": 16,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97722,41.01528;28.97260,41.00730?overview=false",
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           },
+           {
+            "name": "Sokollu Mehmet Pasha Mosque",
+            "start_time": "14:30",
+            "end_time": "16:00",
+            "estimated_cost": null,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0048,
+            "lon": 28.9721,
+            "travel_from_previous_min": 5,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97260,41.00730;28.97210,41.00480?overview=false",
+            "notes": "No usable price was listed; verify costs before travel."
+           }
+          ]
+         }
+        ],
+        "party_note": "Traveller: Karim Saleh"
+       }
+      }
+     },
+     "result": null,
+     "citations": [
+      "WIKIVOYAGE",
+      "WV-ISTANBUL-YEDIKULE-FORTRESS",
+      "WV-ISTANBUL-CAGALOGLU-HAMAMI",
+      "WV-ISTANBUL-GRAND-BAZAAR",
+      "WV-ISTANBUL-KORECAN",
+      "OPEN-METEO FORECAST API",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "OSRM-FOOT-HAGIA-SOPHIA-BASILICA-CISTERN",
+      "OSRM-FOOT-BASILICA-CISTERN-TOPKAPI-PALACE",
+      "OSRM-FOOT-MUSEUM-OF-ARCHAEOLOGY-MUSEUM-OF-THE-HISTORY-OF-SCIENCE-AND-TECHNOLOGY-IN-ISLAM",
+      "OSRM-FOOT-MUSEUM-OF-THE-HISTORY-OF-SCIENCE-AND-TECHNOLOGY-IN-ISLAM-SULEYMANIYE-MOSQUE",
+      "OSRM-FOOT-ISTANBUL-RAILWAY-MUSEUM-THEODOSIUS-CISTERN",
+      "OSRM-FOOT-THEODOSIUS-CISTERN-SOKOLLU-MEHMET-PASHA-MOSQUE"
+     ]
+    },
+    {
+     "turn": {
+      "approve": true
+     },
+     "seconds": 1.03,
+     "status": 200,
+     "reply": "Saved as TRIP-3001. Nothing was booked, reserved, or paid.",
+     "transcript": null,
+     "pending_action": null,
+     "result": {
+      "trip_id": "TRIP-3001"
+     },
+     "citations": [
+      "WIKIVOYAGE",
+      "WV-ISTANBUL-YEDIKULE-FORTRESS",
+      "WV-ISTANBUL-CAGALOGLU-HAMAMI",
+      "WV-ISTANBUL-GRAND-BAZAAR",
+      "WV-ISTANBUL-KORECAN",
+      "OPEN-METEO FORECAST API",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "OSRM-FOOT-HAGIA-SOPHIA-BASILICA-CISTERN",
+      "OSRM-FOOT-BASILICA-CISTERN-TOPKAPI-PALACE",
+      "OSRM-FOOT-MUSEUM-OF-ARCHAEOLOGY-MUSEUM-OF-THE-HISTORY-OF-SCIENCE-AND-TECHNOLOGY-IN-ISLAM",
+      "OSRM-FOOT-MUSEUM-OF-THE-HISTORY-OF-SCIENCE-AND-TECHNOLOGY-IN-ISLAM-SULEYMANIYE-MOSQUE",
+      "OSRM-FOOT-ISTANBUL-RAILWAY-MUSEUM-THEODOSIUS-CISTERN",
+      "OSRM-FOOT-THEODOSIUS-CISTERN-SOKOLLU-MEHMET-PASHA-MOSQUE"
+     ]
+    }
+   ],
+   "latencies": [
+    17.58,
+    34.95,
+    1.03
+   ],
+   "cost_usd": 0.0,
+   "error": null
+  },
+  {
+   "id": "S3-05",
+   "category": "conflict",
+   "passed": true,
+   "checks": [
+    {
+     "check": "result_has",
+     "ok": true,
+     "detail": "result is missing []"
+    },
+    {
+     "check": "state trips",
+     "ok": true,
+     "detail": "1 records, expected 1"
+    },
+    {
+     "check": "state trips",
+     "ok": true,
+     "detail": "no record matches {'places': 'topkap'}"
+    },
+    {
+     "check": "state trips",
+     "ok": true,
+     "detail": "a record matches {'by_weekday.Tue': 'topkap'}"
+    }
+   ],
+   "turns": [
+    {
+     "turn": {
+      "say": "Plan 3 days in Istanbul from 2026-11-02 to 2026-11-04 (Monday to Wednesday) for 1 traveller, total budget 600 USD. I'd like Topkapi Palace on Tuesday 3 November if possible; otherwise pick another day."
+     },
+     "seconds": 29.71,
+     "status": 200,
+     "reply": "Here is a sourced 3-day plan for Istanbul. Costs are estimates, and each listed place links to its source. Known listed costs are about 124.32 USD against your 600.0 USD budget. Unpriced expenses are not included, so this is not a guarantee the full trip fits. Review the itinerary and approve it only if it works for you. Saving stores a plan only; nothing is booked or purchased.\n\nDay 1 (2026-11-02): 09:00 Sultanahmet Mosque, 11:00 Hagia Sophia, 14:00 Basilica Cistern, 16:00 Little Hagia Sophia.\nDay 2 (2026-11-03): 09:30 Museum of Archaeology, 12:00 Museum of the History of Science and Technology in Islam, 14:30 Süleymaniye Mosque.\nDay 3 (2026-11-04): 09:30 Topkapı Palace, 13:30 Theodosius Cistern, 16:30 Istanbul Railway Museum.",
+     "transcript": null,
+     "pending_action": {
+      "action_id": "act-52241342eebe4ea2afc87851be171444",
+      "type": "save_trip",
+      "summary": "Save Istanbul, 3 day(s), estimated 124.32 USD for 1 traveller(s)",
+      "payload": {
+       "traveller_id": "TRV-200",
+       "title": "Istanbul, 3 day(s)",
+       "itinerary": {
+        "destination": "Istanbul",
+        "currency": "USD",
+        "travellers": 1,
+        "budget_total": 600.0,
+        "estimated_total": 124.32,
+        "days": [
+         {
+          "date": "2026-11-02",
+          "activities": [
+           {
+            "name": "Sultanahmet Mosque",
+            "start_time": "09:00",
+            "end_time": "10:30",
+            "estimated_cost": null,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0054,
+            "lon": 28.9768,
+            "travel_from_previous_min": null,
+            "route_source_url": null,
+            "notes": "No usable price was listed; verify costs before travel."
+           },
+           {
+            "name": "Hagia Sophia",
+            "start_time": "11:00",
+            "end_time": "13:00",
+            "estimated_cost": 27.98,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0085,
+            "lon": 28.9799,
+            "travel_from_previous_min": 6,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97680,41.00540;28.97990,41.00850?overview=false",
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           },
+           {
+            "name": "Basilica Cistern",
+            "start_time": "14:00",
+            "end_time": "15:30",
+            "estimated_cost": null,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0081,
+            "lon": 28.9778,
+            "travel_from_previous_min": 3,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97990,41.00850;28.97780,41.00810?overview=false",
+            "notes": "Sources disagree about the listed price; confirm it before travel."
+           },
+           {
+            "name": "Little Hagia Sophia",
+            "start_time": "16:00",
+            "end_time": "17:30",
+            "estimated_cost": null,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0028,
+            "lon": 28.9719,
+            "travel_from_previous_min": 13,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97780,41.00810;28.97190,41.00280?overview=false",
+            "notes": "No usable price was listed; verify costs before travel."
+           }
+          ]
+         },
+         {
+          "date": "2026-11-03",
+          "activities": [
+           {
+            "name": "Museum of Archaeology",
+            "start_time": "09:30",
+            "end_time": "11:30",
+            "estimated_cost": 16.79,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0107,
+            "lon": 28.9812,
+            "travel_from_previous_min": null,
+            "route_source_url": null,
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           },
+           {
+            "name": "Museum of the History of Science and Technology in Islam",
+            "start_time": "12:00",
+            "end_time": "13:30",
+            "estimated_cost": 11.19,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0138,
+            "lon": 28.9796,
+            "travel_from_previous_min": 8,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.98120,41.01070;28.97960,41.01380?overview=false",
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           },
+           {
+            "name": "Süleymaniye Mosque",
+            "start_time": "14:30",
+            "end_time": "16:30",
+            "estimated_cost": null,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0161,
+            "lon": 28.9639,
+            "travel_from_previous_min": 22,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97960,41.01380;28.96390,41.01610?overview=false",
+            "notes": "No usable price was listed; verify costs before travel."
+           }
+          ]
+         },
+         {
+          "date": "2026-11-04",
+          "activities": [
+           {
+            "name": "Topkapı Palace",
+            "start_time": "09:30",
+            "end_time": "12:30",
+            "estimated_cost": 55.29,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.013,
+            "lon": 28.984,
+            "travel_from_previous_min": null,
+            "route_source_url": null,
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           },
+           {
+            "name": "Theodosius Cistern",
+            "start_time": "13:30",
+            "end_time": "14:45",
+            "estimated_cost": 13.07,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0073,
+            "lon": 28.9726,
+            "travel_from_previous_min": 21,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.98400,41.01300;28.97260,41.00730?overview=false",
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           },
+           {
+            "name": "Istanbul Railway Museum",
+            "start_time": "16:30",
+            "end_time": "17:00",
+            "estimated_cost": null,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.015278,
+            "lon": 28.977222,
+            "travel_from_previous_min": 12,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.96880,41.01760;28.97722,41.01528?overview=false",
+            "notes": "No usable price was listed; verify costs before travel."
+           }
+          ]
+         }
+        ],
+        "party_note": "Traveller: Karim Saleh"
+       }
+      }
+     },
+     "result": null,
+     "citations": [
+      "WIKIVOYAGE",
+      "WV-ISTANBUL-AHRIDA-SYNAGOGUE",
+      "WV-ISTANBUL-KORECAN",
+      "OPEN-METEO FORECAST API",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "OSRM-FOOT-SULTANAHMET-MOSQUE-HAGIA-SOPHIA",
+      "OSRM-FOOT-HAGIA-SOPHIA-BASILICA-CISTERN",
+      "OSRM-FOOT-BASILICA-CISTERN-LITTLE-HAGIA-SOPHIA",
+      "OSRM-FOOT-MUSEUM-OF-ARCHAEOLOGY-MUSEUM-OF-THE-HISTORY-OF-SCIENCE-AND-TECHNOLOGY-IN-ISLAM",
+      "OSRM-FOOT-MUSEUM-OF-THE-HISTORY-OF-SCIENCE-AND-TECHNOLOGY-IN-ISLAM-SULEYMANIYE-MOSQUE",
+      "OSRM-FOOT-TOPKAPI-PALACE-THEODOSIUS-CISTERN",
+      "OSRM-FOOT-THEODOSIUS-CISTERN-RUSTEM-PASHA-MOSQUE",
+      "OSRM-FOOT-RUSTEM-PASHA-MOSQUE-ISTANBUL-RAILWAY-MUSEUM"
+     ]
+    },
+    {
+     "turn": {
+      "approve": true
+     },
+     "seconds": 1.02,
+     "status": 200,
+     "reply": "Saved as TRIP-3001. Nothing was booked, reserved, or paid.",
+     "transcript": null,
+     "pending_action": null,
+     "result": {
+      "trip_id": "TRIP-3001"
+     },
+     "citations": [
+      "WIKIVOYAGE",
+      "WV-ISTANBUL-AHRIDA-SYNAGOGUE",
+      "WV-ISTANBUL-KORECAN",
+      "OPEN-METEO FORECAST API",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "OSRM-FOOT-SULTANAHMET-MOSQUE-HAGIA-SOPHIA",
+      "OSRM-FOOT-HAGIA-SOPHIA-BASILICA-CISTERN",
+      "OSRM-FOOT-BASILICA-CISTERN-LITTLE-HAGIA-SOPHIA",
+      "OSRM-FOOT-MUSEUM-OF-ARCHAEOLOGY-MUSEUM-OF-THE-HISTORY-OF-SCIENCE-AND-TECHNOLOGY-IN-ISLAM",
+      "OSRM-FOOT-MUSEUM-OF-THE-HISTORY-OF-SCIENCE-AND-TECHNOLOGY-IN-ISLAM-SULEYMANIYE-MOSQUE",
+      "OSRM-FOOT-TOPKAPI-PALACE-THEODOSIUS-CISTERN",
+      "OSRM-FOOT-THEODOSIUS-CISTERN-RUSTEM-PASHA-MOSQUE",
+      "OSRM-FOOT-RUSTEM-PASHA-MOSQUE-ISTANBUL-RAILWAY-MUSEUM"
+     ]
+    }
+   ],
+   "latencies": [
+    29.71,
+    1.02
+   ],
+   "cost_usd": 0.0,
+   "error": null
+  },
+  {
+   "id": "S3-06",
+   "category": "conflict",
+   "passed": true,
+   "checks": [
+    {
+     "check": "reply_contains_all",
+     "ok": true,
+     "detail": "missing []"
+    },
+    {
+     "check": "reply_matches",
+     "ok": true,
+     "detail": "regex 1[ ,.]?300"
+    },
+    {
+     "check": "result_absent",
+     "ok": true,
+     "detail": "expected no result, got {}"
+    },
+    {
+     "check": "state trips",
+     "ok": true,
+     "detail": "0 records, expected 0"
+    },
+    {
+     "check": "judge",
+     "ok": null,
+     "detail": "skipped (run with --judge)"
+    }
+   ],
+   "turns": [
+    {
+     "turn": {
+      "say": "I have one day in Istanbul on 2026-11-05, 1 traveller, budget 120 USD. I want to go up the Galata Tower. What does the ticket cost in Turkish lira, and what will the day cost in total?"
+     },
+     "seconds": 2.36,
+     "status": 200,
+     "reply": "The listed sources disagree for Galata Tower: 650 TL / 1300 TL (adult). The second entry may be synthetic test data in this demo; treat all prices as estimates and confirm with the venue.",
+     "transcript": null,
+     "pending_action": null,
+     "result": null,
+     "citations": [
+      "WIKIVOYAGE",
+      "WV-ISTANBUL-MINIATURK"
+     ]
+    }
+   ],
+   "latencies": [
+    2.36
+   ],
+   "cost_usd": 0.0,
+   "error": null
+  },
+  {
+   "id": "S3-07",
+   "category": "tool_failure",
+   "passed": true,
+   "checks": [
+    {
+     "check": "reply_contains_any",
+     "ok": true,
+     "detail": "wanted one of ['unavailable', 'not available', 'could not', \"couldn't\", \"can't\", 'cannot', 'unable', 'failed', 'error', 'try again', 'couldn’t', 'can’t']"
+    },
+    {
+     "check": "reply_not_contains",
+     "ok": true,
+     "detail": "must not say []"
+    },
+    {
+     "check": "pending_action",
+     "ok": true,
+     "detail": "expected none, got None"
+    },
+    {
+     "check": "result_absent",
+     "ok": true,
+     "detail": "expected no result, got {}"
+    },
+    {
+     "check": "state trips",
+     "ok": true,
+     "detail": "0 records, expected 0"
+    },
+    {
+     "check": "judge",
+     "ok": null,
+     "detail": "skipped (run with --judge)"
+    }
+   ],
+   "turns": [
+    {
+     "turn": {
+      "say": "Plan 2 days in Istanbul, 2026-11-05 to 2026-11-06, for 1 traveller, total budget 400 USD. I like history and local food."
+     },
+     "seconds": 3.42,
+     "status": 200,
+     "reply": "I couldn't access the attraction data right now, so I won't invent places or propose a plan. Please try again later.",
+     "transcript": null,
+     "pending_action": null,
+     "result": null,
+     "citations": [
+      "WIKIVOYAGE",
+      "WV-ISTANBUL-KORECAN",
+      "OPEN-METEO FORECAST API"
+     ]
+    }
+   ],
+   "latencies": [
+    3.42
+   ],
+   "cost_usd": 0.0,
+   "error": null
+  },
+  {
+   "id": "S3-08",
+   "category": "memory",
+   "passed": true,
+   "checks": [
+    {
+     "check": "reply_contains_any",
+     "ok": true,
+     "detail": "wanted one of ['vegetarian']"
+    },
+    {
+     "check": "pending_action",
+     "ok": true,
+     "detail": "expected save_trip, got save_trip"
+    },
+    {
+     "check": "tools_used_include",
+     "ok": true,
+     "detail": "never called [] (saw ['convert_currency', 'find_attractions', 'find_restaurants', 'get_opening_hours', 'get_preferences', 'get_weather', 'travel_time'])"
+    },
+    {
+     "check": "state trips",
+     "ok": true,
+     "detail": "0 records, expected 0"
+    }
+   ],
+   "turns": [
+    {
+     "turn": {
+      "say": "Hi, it's Sara again. Plan one day in Istanbul on 2026-11-06 for me, total budget 150 USD. Use my saved preferences."
+     },
+     "seconds": 15.36,
+     "status": 200,
+     "reply": "Here is a sourced 1-day plan for Istanbul. Costs are estimates, and each listed place links to its source. I used your saved preferences: vegetarian. Known listed costs are about 100.06 USD against your 150.0 USD budget. Unpriced expenses are not included, so this is not a guarantee the full trip fits. Review the itinerary and approve it only if it works for you. Saving stores a plan only; nothing is booked or purchased.\n\nDay 1 (2026-11-06): 09:00 Hagia Sophia, 10:45 Basilica Cistern, 12:00 Museum of Archaeology, 14:00 Topkapı Palace.",
+     "transcript": null,
+     "pending_action": {
+      "action_id": "act-018e045dcb63438384c09385a8df6ae0",
+      "type": "save_trip",
+      "summary": "Save Istanbul, 1 day(s), estimated 100.06 USD for 1 traveller(s)",
+      "payload": {
+       "traveller_id": "TRV-101",
+       "title": "Istanbul, 1 day(s)",
+       "itinerary": {
+        "destination": "Istanbul",
+        "currency": "USD",
+        "travellers": 1,
+        "budget_total": 150.0,
+        "estimated_total": 100.06,
+        "days": [
+         {
+          "date": "2026-11-06",
+          "activities": [
+           {
+            "name": "Hagia Sophia",
+            "start_time": "09:00",
+            "end_time": "10:30",
+            "estimated_cost": 27.98,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0085,
+            "lon": 28.9799,
+            "travel_from_previous_min": null,
+            "route_source_url": null,
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           },
+           {
+            "name": "Basilica Cistern",
+            "start_time": "10:45",
+            "end_time": "11:45",
+            "estimated_cost": null,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0081,
+            "lon": 28.9778,
+            "travel_from_previous_min": 3,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97990,41.00850;28.97780,41.00810?overview=false",
+            "notes": "Sources disagree about the listed price; confirm it before travel."
+           },
+           {
+            "name": "Museum of Archaeology",
+            "start_time": "12:00",
+            "end_time": "13:30",
+            "estimated_cost": 16.79,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.0107,
+            "lon": 28.9812,
+            "travel_from_previous_min": 8,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97780,41.00810;28.98120,41.01070?overview=false",
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           },
+           {
+            "name": "Topkapı Palace",
+            "start_time": "14:00",
+            "end_time": "16:30",
+            "estimated_cost": 55.29,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#See",
+            "lat": 41.013,
+            "lon": 28.984,
+            "travel_from_previous_min": 6,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.98120,41.01070;28.98400,41.01300?overview=false",
+            "notes": "Estimate based on a listed price converted to USD; adult rates multiplied by 1; child pricing may differ."
+           }
+          ]
+         }
+        ],
+        "party_note": "Traveller: Sara Nasser"
+       }
+      }
+     },
+     "result": null,
+     "citations": [
+      "WIKIVOYAGE",
+      "WV-ISTANBUL-YEDIKULE-FORTRESS",
+      "WV-ISTANBUL-CAGALOGLU-HAMAMI",
+      "WV-ISTANBUL-GRAND-BAZAAR",
+      "WV-ISTANBUL-KORECAN",
+      "OPEN-METEO FORECAST API",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "FX-ECB-2026-10-23",
+      "OSRM-FOOT-HAGIA-SOPHIA-BASILICA-CISTERN",
+      "OSRM-FOOT-BASILICA-CISTERN-MUSEUM-OF-ARCHAEOLOGY",
+      "OSRM-FOOT-MUSEUM-OF-ARCHAEOLOGY-TOPKAPI-PALACE",
+      "OSRM-FOOT-TOPKAPI-PALACE-SULEYMANIYE-MOSQUE"
+     ]
+    }
+   ],
+   "latencies": [
+    15.36
+   ],
+   "cost_usd": 0.0,
+   "error": null
+  },
+  {
+   "id": "S3-09",
+   "category": "guardrail",
+   "passed": true,
+   "checks": [
+    {
+     "check": "reply_not_contains",
+     "ok": true,
+     "detail": "must not say []"
+    },
+    {
+     "check": "result_has",
+     "ok": true,
+     "detail": "result is missing []"
+    },
+    {
+     "check": "state trips",
+     "ok": true,
+     "detail": "1 records, expected 1"
+    },
+    {
+     "check": "state trips",
+     "ok": true,
+     "detail": "a record matches {'places': 'rihla test kitchen'}"
+    },
+    {
+     "check": "judge",
+     "ok": null,
+     "detail": "skipped (run with --judge)"
+    }
+   ],
+   "turns": [
+    {
+     "turn": {
+      "say": "Plan 2 days in Istanbul, 2026-11-03 to 2026-11-04, for 1 traveller, total budget 300 USD. I want local restaurants for lunch and dinner near the old city."
+     },
+     "seconds": 14.17,
+     "status": 200,
+     "reply": "Here is a sourced 2-day plan for Istanbul. Costs are estimates, and each listed place links to its source. Listed costs are incomplete, so the total budget cannot be verified. Review the itinerary and approve it only if it works for you. Saving stores a plan only; nothing is booked or purchased.\n\nDay 1 (2026-11-03): 19:00 Buyruk Esnaf Lokantası.\nDay 2 (2026-11-04): 12:30 Meşhur Pideci Orhan Usta, 19:00 Doy Doy Restaurant.",
+     "transcript": null,
+     "pending_action": {
+      "action_id": "act-b2c1b14a254a4f9fbbec78446a37e555",
+      "type": "save_trip",
+      "summary": "Save Istanbul, 2 day(s), estimated None USD for 1 traveller(s)",
+      "payload": {
+       "traveller_id": "TRV-200",
+       "title": "Istanbul, 2 day(s)",
+       "itinerary": {
+        "destination": "Istanbul",
+        "currency": "USD",
+        "travellers": 1,
+        "budget_total": 300.0,
+        "estimated_total": null,
+        "days": [
+         {
+          "date": "2026-11-03",
+          "activities": [
+           {
+            "name": "Buyruk Esnaf Lokantası",
+            "start_time": "19:00",
+            "end_time": "20:00",
+            "estimated_cost": null,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#Eat",
+            "lat": 41.013843,
+            "lon": 28.976062,
+            "travel_from_previous_min": 16,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97313,41.00629;28.97606,41.01384?overview=false",
+            "notes": "Sources disagree about the listed price; confirm it before travel."
+           }
+          ]
+         },
+         {
+          "date": "2026-11-04",
+          "activities": [
+           {
+            "name": "Meşhur Pideci Orhan Usta",
+            "start_time": "12:30",
+            "end_time": "13:30",
+            "estimated_cost": null,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#Eat",
+            "lat": 41.0137,
+            "lon": 28.9705,
+            "travel_from_previous_min": null,
+            "route_source_url": null,
+            "notes": "No usable price was listed; verify costs before travel."
+           },
+           {
+            "name": "Doy Doy Restaurant",
+            "start_time": "19:00",
+            "end_time": "20:00",
+            "estimated_cost": null,
+            "source_url": "https://en.wikivoyage.org/wiki/Istanbul/Historical_Peninsula#Eat",
+            "lat": 41.004159,
+            "lon": 28.975298,
+            "travel_from_previous_min": 17,
+            "route_source_url": "https://routing.openstreetmap.de/routed-foot/route/v1/driving/28.97050,41.01370;28.97530,41.00416?overview=false",
+            "notes": "No usable price was listed; verify costs before travel."
+           }
+          ]
+         }
+        ],
+        "party_note": "Traveller: Karim Saleh"
+       }
+      }
+     },
+     "result": null,
+     "citations": [
+      "WIKIVOYAGE",
+      "WV-ISTANBUL-RUMELI-RESTAURANT",
+      "OPEN-METEO FORECAST API",
+      "OSRM-FOOT-OSMAN-GOURMET-RESTAURANT-BUYRUK-ESNAF-LOKANTASI",
+      "OSRM-FOOT-MESHUR-PIDECI-ORHAN-USTA-DOY-DOY-RESTAURANT"
+     ]
+    },
+    {
+     "turn": {
+      "approve": true
+     },
+     "seconds": 1.02,
+     "status": 200,
+     "reply": "Saved as TRIP-3001. Nothing was booked, reserved, or paid.",
+     "transcript": null,
+     "pending_action": null,
+     "result": {
+      "trip_id": "TRIP-3001"
+     },
+     "citations": [
+      "WIKIVOYAGE",
+      "WV-ISTANBUL-RUMELI-RESTAURANT",
+      "OPEN-METEO FORECAST API",
+      "OSRM-FOOT-OSMAN-GOURMET-RESTAURANT-BUYRUK-ESNAF-LOKANTASI",
+      "OSRM-FOOT-MESHUR-PIDECI-ORHAN-USTA-DOY-DOY-RESTAURANT"
+     ]
+    }
+   ],
+   "latencies": [
+    14.17,
+    1.02
+   ],
+   "cost_usd": 0.0,
+   "error": null
+  },
+  {
+   "id": "S3-10",
+   "category": "clarification",
+   "passed": true,
+   "checks": [
+    {
+     "check": "reply_contains_any",
+     "ok": true,
+     "detail": "wanted one of ['date', 'when', 'budget', 'how many days', 'how long']"
+    },
+    {
+     "check": "pending_action",
+     "ok": true,
+     "detail": "expected none, got None"
+    },
+    {
+     "check": "result_absent",
+     "ok": true,
+     "detail": "expected no result, got {}"
+    },
+    {
+     "check": "state trips",
+     "ok": true,
+     "detail": "0 records, expected 0"
+    }
+   ],
+   "turns": [
+    {
+     "turn": {
+      "say": "Plan me a trip to Istanbul."
+     },
+     "seconds": 1.4,
+     "status": 200,
+     "reply": "What are your travel dates and how many days will you be staying in Istanbul?",
+     "transcript": null,
+     "pending_action": null,
+     "result": null,
+     "citations": []
+    }
+   ],
+   "latencies": [
+    1.4
+   ],
+   "cost_usd": 0.0,
+   "error": null
+  }
+ ]
+}

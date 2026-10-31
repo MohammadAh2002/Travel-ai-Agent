@@ -1,0 +1,37 @@
+# Rihla Travel Crew: one command starts the replay gateway and the app.
+services:
+  travel-api:
+    build:
+      context: ./kit
+      dockerfile: services/Dockerfile
+    ports:
+      - "8103:8103"
+    environment:
+      TRAVEL_API_KEY: ${TRAVEL_API_KEY:-dev-key-change-me}
+      TRAVEL_MODE: ${TRAVEL_MODE:-replay}
+      TRAVEL_TODAY: ${TRAVEL_TODAY:-}
+      TRAVEL_OVERLAYS: ${TRAVEL_OVERLAYS:-}
+      TRAVEL_CONTACT: ${TRAVEL_CONTACT:-}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8103/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENROUTER_BASE_URL: ${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+      MODEL: ${MODEL:-openai/gpt-4.1-mini}
+      TRAVEL_API_URL: http://travel-api:8103
+      TRAVEL_API_KEY: ${TRAVEL_API_KEY:-dev-key-change-me}
+      WATCH_INTERVAL_SECONDS: ${WATCH_INTERVAL_SECONDS:-3600}
+      VOICE_MODEL: ${VOICE_MODEL:-tiny}
+    depends_on:
+      travel-api:
+        condition: service_healthy

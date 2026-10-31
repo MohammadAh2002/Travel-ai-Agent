@@ -1,217 +1,151 @@
-<!-- JHF-BRAND -->
-<div align="center" style="padding:28px 20px; background:#ffffff; border:2px solid #e0e0e0; border-radius:12px;">
-  <p style="margin:0 0 16px 0;">
-    <img src="../../assets/jhf-logo.png" alt="Jerusalem High-Tech Foundry (JHF)" height="54" style="vertical-align:middle; margin:0 22px;" />
-    <img src="../../assets/comcec-logo.png" alt="COMCEC - Cooperation for Development" height="72" style="vertical-align:middle; margin:0 22px;" />
-  </p>
-  <h1 style="color:#1a3c5e; margin:6px 0;">Agentic AI Bootcamp</h1>
-  <h3 style="color:#0078d4; margin:4px 0; font-weight:600;">The Ship Week &middot; Brief 3 &mdash; The Trip Planning Crew</h3>
-  <hr style="border:0; border-top:1px solid #0078d4; width:60%; margin:16px auto;" />
-  <p style="font-size:14px; color:#555; margin:6px 0;">
-    <strong>Lead Trainers</strong><br/>
-    <a href="https://www.linkedin.com/in/alaaldin-ahmed-260266150" target="_blank">Alaaldin Ahmed</a> &nbsp;|&nbsp;
-    <a href="https://il.linkedin.com/in/mohammad-abu-alhalawe" target="_blank">Mohammad Abu Alhalaweh</a>
-  </p>
-  <p style="font-size:12.5px; color:#777; margin:8px 0 0 0;">
-    Organized by <strong>Jerusalem High-Tech Foundry (JHF)</strong> &nbsp;&middot;&nbsp; In partnership with <strong>COMCEC</strong>
-  </p>
-</div>
+# Rihla — Travel, thoughtfully planned
 
-# Brief 3 — The Trip Planning Crew
+Rihla is a travel-planning crew that asks what it needs, researches sourced activities, and leaves itinerary decisions and saving in the traveller's hands. It is built on the provided Scenario 3 travel gateway and MCP server.
 
-### Client: Rihla *(fictional start-up, real open data)* · Pattern: a multi-agent crew + research with sources + constraints + revision
+> **Nothing is booked or purchased.** A saved itinerary is only stored in the simulated Rihla Trip Store. Prices and routes are estimates.
 
-> **In one line:** a traveller gives a destination, dates, a budget and interests; a
-> **crew of specialised agents** researches real places, prices them, schedules them
-> around opening hours and walking times, **verifies** the plan, revises it on
-> request without starting over, and saves it **only after the traveller approves**.
-> It never books or buys anything.
+## What makes it useful
 
-← [Back to the Ship Week brief](../README.md) · Contract: [CONTRACT.md](../common/CONTRACT.md) · Kit: [`kit/`](kit/README.md)
+- Conversational clarification for dates, budget, party size and children's ages, pace, interests and hotel use.
+- Ten focused CrewAI roles, routed only when relevant: Coordinator/Clarifier, Place Researcher, Lodging Advisor, Weather Analyst, Route & Mobility Analyst, Budget Analyst, Itinerary Planner, Revision Specialist, Documents Advisor and independent Itinerary Critic.
+- Sourced day plans with itinerary revisions, opening-day checks, converted listed ticket estimates and disclosed uncertainty.
+- Quick-start suggestion chips for trip preparation, official travel-document links, one-day planning, nearby places, trip plans and hourly watches — everything is done in chat.
+- Google Maps coordinate pins and supported Google Maps links for approximate nearby search.
+- Voice input with local faster-whisper speech-to-text.
+- Traveller preference memory and explicit approval for saved changes.
+- A hard approval gate for trip saves, using the approved action ID as the idempotency key.
+- Chat-first responsive web UI: trip details (dates, budget, party size) are collected conversationally, and itineraries render as inline cards with source citations, a map and approve/reject controls.
 
----
+## Run the app
 
-## The client's problem
+### Docker Compose
 
-Rihla (fictional) is a small travel start-up. Its customers don't want a list of
-"top 10 sights". They want a plan they can actually **follow**: the museum is
-open that day, the walk between stops is realistic, lunch is near the morning's
-sight, and the total fits the budget. Rihla's founders tried a single chatbot. It
-invented opening hours, scheduled a closed museum and got prices wrong by half.
+1. Copy `.env.example` to `.env`.
+2. Set `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, and `MODEL` in `.env` for your OpenAI-compatible provider. Do not commit this file.
+3. Start the travel gateway and app:
 
-Their non-negotiables:
-
-> *"Every place, price and opening time must come with its source. Prices are
-> estimates and must say so. When sources disagree, show the range. Never book,
-> never buy. And when I say 'make day two cheaper', change day two, not the whole trip."*
-
-**Users.** The **traveller**, on a web page. Rihla's **travel advisor**, who reviews saved plans.
-
-## What "done" looks like
-
-```text
-Traveller  3 days in Istanbul, 2 people, $700 in total, from <date>. We love history
-           and street food; walking is fine.
-Crew       (researcher → budget analyst → itinerary planner → verifier, all visible in tool_calls)
-Agent      Here's a 3-day plan for 2 people, estimated at $612 of your $700.
-           Day 1 · Old City: 09:00 <museum> (est. $… pp, source ↗) → 12-minute walk →
-           11:00 <cistern> (est. $…–$… pp: two sources disagree) → 13:00 lunch at <place> …
-           I moved <palace> to Day 2: its listing says it's closed on <weekday>.
-           Shall I save this plan?                                  [ Approve ] [ Reject ]
-Traveller  Make day 2 cheaper.
-Agent      Day 2 now costs $78 instead of $131: I swapped the boat tour for the public
-           ferry. Days 1 and 3 are unchanged. Save it?
-Traveller  (clicks Approve)
-Agent      Saved as TRIP-3001. Nothing was booked: prices are estimates from the sources shown.
+```powershell
+docker compose up --build
 ```
 
-*(Illustrative only. Your places, prices, hours and links come from the kit's data, never from memory.)*
+Open `http://localhost:8000`. Replay mode serves cached Istanbul and Amman data by default. The gateway API is on `http://localhost:8103`.
 
-**What a working solution looks like** (the kit's UI starter, driven by a working crew):
+### Local Python
 
-<p align="center">
-  <img src="../visuals/screens/s3-plan-with-sources.jpg" alt="The trip form, the conversation and the itinerary table with times, estimated costs and a source for every row" width="40%"/>
-  <img src="../visuals/screens/s3-saved-after-approval.jpg" alt="After Approve: saved as TRIP-3001, nothing was booked or paid" width="58%"/>
-</p>
+Use Python 3.12. The existing `kit\.venv` already has all dependencies (`pip install -r src\requirements.txt` covers the app). Activate it, then open two terminals:
 
-## The blueprint
+```powershell
+kit\.venv\Scripts\activate
+cd kit
+uvicorn services.travel_api:app --port 8103
+```
 
-<p align="center"><img src="../visuals/s3-architecture.png" alt="Scenario 3 architecture: the traveller's web page, your FastAPI, a CrewAI crew with coordinator, researcher, budget analyst, itinerary planner and verifier, the travel MCP server, the travel data gateway with a replay cache in front of Wikivoyage, OpenStreetMap, Open-Meteo, the ECB and a routing service, and the trip store" width="960"/></p>
+```powershell
+kit\.venv\Scripts\activate
+cd src
+uvicorn app.main:app --port 8000
+```
 
-### The crew and the revision loop
+Visit `http://localhost:8000`. `GET /health` reports whether the model key is configured.
+The simulated gateway defaults to `dev-key-change-me`. If you replace `TRAVEL_API_KEY` in `.env`, also export that same value in the shell used to start the gateway; the provided gateway reads its key from the process environment.
 
-<p align="center"><img src="../visuals/s3-crew-loop.png" alt="The coordinator plans the work, the researcher, budget analyst and itinerary planner produce a draft, the verifier checks it and sends failures back, the traveller revises or approves, save_trip runs only after approval" width="960"/></p>
+## API and evaluation
 
-**CrewAI** fits naturally: a coordinator (manager) and specialists with their own
-tools. The plan is **state**: a Pydantic `Itinerary` your API keeps per session.
-A revision changes that state; it doesn't start a new crew from nothing.
+The app implements `POST /api/chat`, `POST /api/approve`, `POST /api/voice` and `GET /health`. Optional hourly watch endpoints are `POST /api/watch`, `GET /api/watch/{session_id}` and `DELETE /api/watch/{watch_id}`.
 
-## What's in your kit
+Run the supplied gateway/MCP smoke test and the ten brief cases after starting the gateway and app:
 
-| Part | What it is |
+```powershell
+python kit/check_kit.py
+python kit/evals/run_evals.py
+python kit/evals/run_evals.py --cases src/evals/cases.extra.jsonl -v
+```
+
+Unit tests (no gateway needed): `cd src && python -m unittest tests.test_core`
+
+The eval runner can write a scorecard with `--out evals/scorecard.md`. It calls the configured model provider and requires the travel gateway and app to be running. Report only the score actually produced; these unit and smoke checks are not a substitute for the LLM-backed scorecard.
+
+### Current scorecard status
+
+| Measure | Status |
 |---|---|
-| `services/travel_api.py` | Rihla's **travel data gateway**: one API over **real open data**, with Wikivoyage listings (places, hours, prices, descriptions), OpenStreetMap geocoding, Open-Meteo weather, ECB exchange rates (via Frankfurter), and walking and driving times (OpenStreetMap routing). Port **8103**, `X-API-Key`, fault switches. |
-| **Replay mode** (default) | Everything answers from a **recorded cache for Istanbul and Amman**: offline, fast, reproducible, free. `live` and `record` modes call the real services. |
-| **Trip store** | Saved trips and **traveller preferences** (budget style, interests, diet, walking tolerance): your persistent memory |
-| `services/travel_mcp.py` | The **MCP server** in front of it (stdio) |
-| `services/cache/overlays/` | **Synthetic** test overlays, clearly labelled: a second price for one listing, a listing with planted instructions |
-| `ui/app_ui.py` | A Gradio client of the contract: a trip form, chat for revisions, the itinerary as a table with source links, Approve / Reject |
-| `evals/` | Sample cases + the shared runner |
-| `check_kit.py` | ✅ when the gateway, the cache and the MCP server answer |
+| Kit API/MCP smoke test | Passed in this workspace |
+| Local unit tests | 18 passed |
+| Kit sample cases | Not run in this verification session |
+| Additional cases | Not run in this verification session |
+| Before/after fix | Before: an LLM draft could include unsupported place names or a listing-closed weekday. After: code keeps only MCP-returned places, replaces source URLs from those tool results, queries opening hours for selected stops, and filters closed-day/timing conflicts before the approval proposal. |
 
-### The travel MCP tools
+## Architecture
 
-| Tool | Use it when |
+```mermaid
+flowchart LR
+  Browser -->|chat / voice / approve| FastAPI
+  FastAPI --> Coordinator[Trip Coordinator / Clarifier]
+  Coordinator -->|itinerary request| PlaceResearcher[Place Researcher]
+  PlaceResearcher --> Budget[Budget Analyst]
+  Budget --> Lodging[Lodging Advisor when relevant]
+  Lodging --> Planner[Itinerary Planner or Revision Specialist]
+  Planner --> Route[Route & Mobility Analyst]
+  Route --> Critic[Independent Itinerary Critic]
+  Coordinator -->|documents question| Documents[Documents Advisor]
+  Coordinator -->|hotel question| Lodging
+  Coordinator -->|weather question| Weather[Weather Analyst]
+  Coordinator -->|route question| Route
+  PlaceResearcher --> MCP
+  MCP --> KitMCP[Provided MCP server]
+  KitMCP --> Gateway[Provided travel gateway]
+  Critic --> Pending[pending_action]
+  Pending -->|traveller approves| Gate[Code approval gate]
+  Gate -->|idempotent MCP write| Store[Simulated Trip Store]
+  FastAPI --> Watches[Weather and FX watches]
+```
+
+See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the full request flow, and [`SUMMARY.md`](SUMMARY.md) for the presentation checklist and implementation notes.
+
+## Repository map
+
+| Path | Responsibility |
 |---|---|
-| `find_attractions(city, interests, limit)` / `find_restaurants(city, budget, limit)` | researching, and every result has a `source_url` |
-| `get_opening_hours(place_name, city)` | **before** scheduling a place on a given day |
-| `travel_time(from_place, to_place, city, mode)` | between consecutive stops, for a realistic day |
-| `get_weather(city, start_date, end_date)` | to move outdoor plans off a rainy day (and be honest when there's no forecast yet) |
-| `convert_currency(amount, from_currency, to_currency)` | turning local prices into the traveller's budget currency |
-| `geocode(place)` | resolving a place name to coordinates |
-| `get_preferences(traveller_id)` / `save_preferences(traveller_id, preferences)` | reading and updating what you know about a returning traveller |
-| `save_trip(traveller_id, title, itinerary, idempotency_key)` | **only from your `/api/approve` code**, never from an agent |
-| `list_trips(traveller_id)` | "plan something like last time" |
+| `src/app/main.py` | Entry point — re-exports the FastAPI app (`uvicorn app.main:app`) |
+| `src/app/api/` | FastAPI endpoints and the approval gate |
+| `src/app/chat/` | `chat_flow` orchestration + deterministic itinerary verification |
+| `src/app/agents/` | Intent-routed CrewAI roles and MCP-backed helpers |
+| `src/app/agents/skills/` | One Markdown skill file per CrewAI role, loaded at startup |
+| `src/app/services/` | MCP client, session memory, hourly watch jobs |
+| `src/app/core/` | Config (`.env` discovery), models, guardrails |
+| `src/app/features/` | Voice, Maps/nearby search, pre-trip checklist |
+| `src/app/static/` | Single-page UI (HTML, CSS and JavaScript) |
+| `src/app/data/travel_docs.json` | Official government references used for document questions |
+| `src/tests/` | Unit tests |
+| `src/evals/` | Our extra eval scenarios |
+| `kit/services/` | Provided simulated gateway and MCP server; unchanged |
+| `kit/evals/` | Provided ten cases and the eval runner |
 
-## Must have (on top of the six Definition of Done items)
+## What is real and what is simulated?
 
-1. **A real crew:** at least **three agents with visible, different responsibilities** (who did what shows in `tool_calls`).
-2. **Sourced facts only:** every place, opening time and price in the plan comes from a tool result and carries its source link; prices are labelled **estimates**.
-3. **A plan you can follow:** day by day, with times, places, travel time between stops, an estimated cost per item, per day and in total.
-4. **Constraints enforced:** opening days and hours respected; no overlaps; walking times realistic; the budget met, or the overrun shown clearly.
-5. **Revise without restarting:** "make day 2 cheaper", "cut the budget by 20%", "no museums on day 3" change the current plan and leave the rest alone.
-6. **Save after approval only:** `save_trip` runs in `/api/approve`; the `TRIP-` ID comes from the API.
-7. **Memory:** a returning traveller's preferences are read and used, and updated when they tell you something new.
-8. **Honest uncertainty:** conflicting prices become a range, missing data is said out loud, a failed tool doesn't produce invented places.
-
-## Required demo scenarios
-
-| # | Scenario | What the audience must see |
-|:--:|---|---|
-| 1 | **Happy path** | a 3-day plan within budget, with sources, saved after Approve (`TRIP-` ID) |
-| 2 | **Constraint change** | "cut the budget by 20%" → a revised plan with a lower total; unchanged days stay unchanged |
-| 3 | **Feasibility** | an attraction closed on one of the days → moved or replaced, and the reply says why |
-| 4 | **Conflicting data** | two prices for one place → a range or an explicit uncertainty |
-| 5 | **Tool failure** | the attractions source fails (switch the fault on live) → an honest reply, no invented places |
-| 6 | **Approval** | Reject → nothing saved; and at no point does anything get booked or bought |
-
-## Real or simulated?
-
-| Component | |
+| Component | Details |
 |---|---|
-| The LLM (OpenRouter) | **Real** |
-| Places, hours, prices, weather, exchange rates, routes | **Real open data**: recorded into the cache, or live in `live` mode |
-| Rihla's trip store and traveller profiles | **Simulated** (fictional travellers) |
-| The overlays (a second price, a planted instruction) | **Synthetic**, labelled, used only by tests |
-| Bookings and payments | **None, ever.** That's a rule, not a gap. |
+| LLM | Real OpenAI-compatible provider, configured by base URL/model/key |
+| Agent orchestration | CrewAI 1.15.31; ten specialized roles, with only relevant roles run per request |
+| Places and routes | Real open data through the kit's gateway; replay cache by default |
+| Weather and currency | Open-Meteo and ECB-based data through the gateway |
+| Trip Store and traveller profiles | Simulated local system |
+| Test overlays | Synthetic data for evaluation only |
+| Voice | Local faster-whisper model; downloads/loads on first use |
+| Flights, hotel rates, reservations and payments | Not provided and never performed |
 
-> **Attribution matters.** The data is © its contributors under open licences
-> (Wikivoyage CC BY-SA, OpenStreetMap ODbL, Open-Meteo CC BY). Keep the kit's
-> attribution section in your README. That's how open data stays open.
+## Honest limitations
 
-## What the hidden tests will probe
+- Replay mode only has the kit's Istanbul and Amman cache. Other destinations require network access and `TRAVEL_MODE=live` or `record`.
+- Wikivoyage listing prices and hours can be stale; official venue details should be rechecked. Estimates don't promise a trip will fit its budget.
+- Adult ticket prices are not child prices. Unknown prices are omitted from totals.
+- Nearby distance is a straight-line walking-time estimate, not routed navigation. This data kit has no pharmacy listings.
+- Visa and entry rules depend on passport nationality, trip purpose, transit and travel dates. The advisor is informational, not legal advice; confirm uncertain cases with the relevant embassy or consulate.
+- Watches can check the gateway's weather/FX data. No hotel or flight pricing feed exists.
+- The Lodging Advisor can use hotel details the traveller provides to reason about itinerary impact, but cannot search, compare, price, or book hotels because the kit has no hotel inventory API.
+- Session state and watches live in process memory and clear on restart. Production deployment should use durable storage and a managed scheduler.
+- Voice requires microphone permission and a compatible faster-whisper install; normal text chat still works without voice.
 
-- **The closed day:** a well-known attraction whose listing says it's closed on one of the trip's days.
-- **Two prices:** sources that disagree, and whether your plan admits it.
-- **A planted instruction:** a listing whose description tries to tell your agents what to do.
-- **Beyond the forecast:** dates too far ahead for a real forecast.
-- **A currency the ECB doesn't publish.**
-- **"Just book the hotel for me":** suggest, never book.
-- **An impossible budget:** say it's impossible and offer the closest plan; don't pretend.
-- **A revision mid-conversation:** the session keeps its plan; the crew changes only what was asked.
+## Attribution
 
-## Stretch goals (bonus, depth over count)
-
-- **Your own city:** record a cache for a third city (`TRAVEL_MODE=record`), and add test cases that use it.
-- **Route optimisation:** order each day's stops by real walking time, and show the minutes saved.
-- **A map:** an HTML map (Leaflet or Folium) of each day's route in your UI.
-- **Export after approval:** a PDF or an `.ics` calendar file of the approved plan.
-- **Alternatives:** "cheapest", "balanced" and "most relaxed" variants, with a trade-off table.
-- **A verifier service over A2A:** the verifier as a separate agent another team could call (Module 7).
-
-## Your week, for this brief
-
-| When | Agent engineer | Platform engineer |
-|---|---|---|
-| Day 1 | DESIGN.md: the crew, each agent's tools and stopping point, the `Itinerary` model | Repo from the kit, `check_kit.py` ✅ in replay mode, FastAPI skeleton |
-| Day 2–3 | Researcher + itinerary planner → a 1-day plan with sources | `/api/chat` end to end; the UI pointed at your API · **Check-in 1** |
-| Day 4–5 | Budget analyst + verifier; the revision loop; approval | Sample cases running; per-agent `tool_calls`; cost per run · **Check-in 2** |
-| Day 6 | Closed days, price conflicts, the planted instruction, failures | Your own cases, `docker compose up` |
-| Day 7 | Fix one failure, rehearse | README, diagram, 3-minute video |
-
-## Tips from people who've built this
-
-- **Cap the crew.** `max_iter`, `max_rpm` and a per-request budget. A crew that loops costs money and fails demos. Measure the cost per plan from day 2.
-- **Let code do the arithmetic.** Totals, per-day sums, currency conversion and the 20% cut are Python, not LLM mental maths.
-- **The verifier checks facts against tool results,** not against its own memory: is this place open on this weekday per `get_opening_hours`? Is the walk under your limit per `travel_time`?
-- **The plan is a Pydantic model** passed between agents (structured outputs), not a paragraph to be re-parsed.
-- **Replay mode first.** Develop and test offline from the cache. Switch to `live` only for a demo of a new city.
-- **Listing text is untrusted.** A description is data about a place, never an instruction to your crew.
-- **CrewAI fails with `JSONDecodeError` on `kickoff()`?** It keeps old run history under
-  `%LOCALAPPDATA%\CrewAI\` (or `~/.local/share/CrewAI/`). Set `CREWAI_STORAGE_DIR` to a new folder name in `.env`.
-
-## Reuse from the course
-
-| You need | Reopen |
-|---|---|
-| A CrewAI crew with roles and tasks | `Module-07-Multi-Agent-Systems/ex1-the-team/team_solution.py` |
-| A manager that routes to specialists | `Module-07-Multi-Agent-Systems/ex2-the-manager/manager_solution.py` |
-| An agent that calls MCP tools over stdio | `Module-05/lab-2-agent-over-mcp/mcp_client_agent_SOLUTION.py` |
-| A critic that sends work back (reflection) | `Module-04-Reflection-and-Robustness/solution-code/reflection_agent_solution.py` |
-| Cost and step caps | `Module-11-Guardrails-Safety-and-Cost/shared/llm.py` · `shared/scorecard.py` |
-| A FastAPI service | `Module-12-Deployment/solution-code/app.py` |
-
-
----
-
-<div align="center" style="padding:14px; border-top:2px solid #0078d4; margin-top:34px;">
-  <p style="margin:0 0 8px 0;">
-    <img src="../../assets/jhf-logo.png" alt="JHF" height="28" style="vertical-align:middle; margin:0 14px; background:#ffffff; padding:6px 10px; border-radius:6px;" />
-    <img src="../../assets/comcec-logo.png" alt="COMCEC" height="40" style="vertical-align:middle; margin:0 14px; background:#ffffff; padding:6px 10px; border-radius:6px;" />
-  </p>
-  <p style="color:#888; font-size:13px; margin:0;">
-    <strong>JHF Agentic AI Bootcamp</strong> &mdash; The Ship Week · Brief 3<br/>
-    Lead Trainers: <a href="https://www.linkedin.com/in/alaaldin-ahmed-260266150">Alaaldin Ahmed</a> &amp; <a href="https://il.linkedin.com/in/mohammad-abu-alhalawe">Mohammad Abu Alhalaweh</a><br/>
-    Organized by Jerusalem High-Tech Foundry (JHF) &middot; In partnership with COMCEC
-  </p>
-</div>
+Travel data is provided by the kit: Wikivoyage (CC BY-SA 4.0), OpenStreetMap contributors (ODbL), Open-Meteo (CC BY 4.0), and European Central Bank reference rates via Frankfurter. Keep source citations and licence attribution when redistributing derived data.

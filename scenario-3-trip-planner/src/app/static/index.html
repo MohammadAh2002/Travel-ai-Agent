@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f7f1e7">
+  <title>Rihla — Travel, thoughtfully planned</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400;1,9..144,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Open conversation menu" aria-expanded="false">☰</button>
+      <a class="brand" href="/" aria-label="Rihla home"><span class="brand-mark">R</span><span class="brand-name">rihla<span class="brand-dot">.</span></span></a>
+      <div class="top-status" id="top-status"><span class="status-dot"></span><span id="status-text">Ready when you are</span></div>
+    </header>
+
+    <div class="workspace">
+      <aside class="sidebar" id="sidebar" aria-label="Conversation navigation">
+        <button class="new-chat-button" id="new-chat" type="button"><span>＋</span> New chat</button>
+        <nav class="sidebar-nav" aria-label="Workspace">
+          <button class="sidebar-nav-item active" id="chats-nav" type="button"><span aria-hidden="true">◷</span> Conversations</button>
+          <button class="sidebar-nav-item" id="alerts-nav" type="button"><span aria-hidden="true">⌁</span> Price watch <span class="soon-tag">Soon</span></button>
+        </nav>
+        <div class="history-heading">Recent conversations</div>
+        <div class="conversation-list" id="conversation-list" aria-label="Saved conversations"></div>
+        <div class="sidebar-foot"><span class="sidebar-foot-mark">R</span><span>Thoughtful travel starts here.</span></div>
+      </aside>
+
+      <main class="chat" id="chat">
+        <div class="thread" id="chat-thread" aria-live="polite">
+          <div class="welcome">
+          <p class="eyebrow">Your travel copilot</p>
+          <h1>Where to, <em>traveller?</em></h1>
+          <p class="lede">Choose a starting point and I'll guide you with a few questions, or just tell me what
+            you have in mind. I'll research real sources and leave every decision with you. Nothing is ever
+            booked for you.</p>
+          <div class="chips" id="chips">
+            <button class="chip" type="button" data-flow="trip">Plan a trip</button>
+            <button class="chip" type="button" data-flow="day">Plan one day</button>
+            <button class="chip" type="button" data-flow="nearby">What's nearby?</button>
+            <button class="chip" type="button" data-flow="documents">Travel documents</button>
+            <button class="chip" type="button" data-flow="checklist">Pre-trip checklist</button>
+            <button class="chip" type="button" data-flow="watch">Watch my trip</button>
+          </div>
+        </div>
+        </div>
+
+        <div class="composer-area">
+          <div class="voice-status" id="voice-status" role="status"></div>
+          <form class="composer" id="chat-form">
+            <textarea id="message" rows="1" placeholder="Tell me where you'd like to go, when, and who's coming..." aria-label="Message Rihla"></textarea>
+            <button id="mic" class="icon-button" type="button" title="Record a voice message" aria-label="Record voice message">♩</button>
+            <button class="send-button" type="submit" aria-label="Send message">↑</button>
+          </form>
+          <p class="composer-note">Enter to send · Shift + Enter for a new line · Plans stay yours: nothing is booked automatically</p>
+        </div>
+      </main>
+
+      <section class="watch-page" id="watch-page" aria-label="Price watch preview" hidden>
+        <div class="watch-content">
+          <div class="watch-kicker"><span class="watch-kicker-icon">⌁</span> YOUR NEXT TRAVEL ADVANTAGE</div>
+          <div class="watch-heading-row">
+            <div>
+              <p class="eyebrow">Price watch <span class="coming-soon">Coming soon</span></p>
+              <h1>Let the right fare<br><em>come to you.</em></h1>
+              <p class="watch-lede">Choose what to watch, set a price that feels right, and pick how often Rihla should check.</p>
+            </div>
+            <div class="watch-orbit" aria-hidden="true"><span>✳</span><i></i><b></b></div>
+          </div>
+
+          <div class="watch-form-card">
+            <div class="watch-card-title">
+              <div><span class="step-number">01</span><h2>Build your price watch</h2></div>
+              <span class="preview-label">PREVIEW</span>
+            </div>
+            <div class="watch-fields">
+              <label class="watch-field">Where are you going?
+                <input type="text" value="Lisbon, Portugal" disabled>
+              </label>
+              <label class="watch-field">Leaving from
+                <input type="text" value="Your departure city" disabled>
+              </label>
+              <label class="watch-field">Travel dates
+                <input type="text" value="Choose your dates" disabled>
+              </label>
+              <fieldset class="watch-field watch-options">
+                <legend>What should the agent check?</legend>
+                <label><input type="checkbox" checked disabled> Flights</label>
+                <label><input type="checkbox" disabled> Hotels</label>
+              </fieldset>
+              <label class="watch-field price-field">Let me know when a ticket is
+                <span class="price-input"><span>$</span><input type="number" value="25" disabled><span>USD or less</span></span>
+              </label>
+              <label class="watch-field">Check prices
+                <select disabled><option>Every day</option><option>Every hour</option><option>Every week</option></select>
+              </label>
+            </div>
+            <div class="watch-notify"><span class="notify-icon">✉</span><span><strong>Get a heads-up</strong><small>We’ll notify you when a price meets your target.</small></span><span class="notify-choice">Email &nbsp;·&nbsp; Push</span></div>
+            <button class="watch-save" type="button" disabled>Save price watch <span>→</span></button>
+            <p class="watch-disclaimer">Preview only — price checks and notifications are not active yet. Nothing is being monitored.</p>
+          </div>
+          <div class="watch-footnote"><span>✳</span> Keep your plans flexible. Rihla never books or buys without you.</div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>
