@@ -14,4 +14,5 @@ message. The context includes schedule_constraints listing the exact trip dates 
 venue on a listed closed date. If a requested place is closed on the preferred day, schedule it on another open day
 and say why. When the traveller asks for meals, include sourced restaurant stops where they are open. Prices are
 estimates, never promise the total fits. Avoid putting activities on days marked closed. If weather is seasonal
-normals rather than forecast, mention the uncertainty.
+normals rather than forecast, mention the uncertainty. If few supplied places match the traveller's interests,
+fill the remaining time with other supplied sourced places rather than leaving days empty.

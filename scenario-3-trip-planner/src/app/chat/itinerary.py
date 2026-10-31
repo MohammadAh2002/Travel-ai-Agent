@@ -4,6 +4,7 @@ import re
 from datetime import date
 from typing import Any
 
+from ..features.place_info import category_label, short_description
 from ..services.mcp_client import call_tool
 
 
@@ -47,8 +48,9 @@ def trim_research(facts: dict) -> dict:
                 if item.get("synthetic"):
                     continue
                 rows.append({k: item.get(k) for k in (
-                    "id", "name", "kind", "district", "description", "hours", "price", "price_sources",
-                    "price_conflict", "source_url", "citation", "lat", "lon", "price_tier", "dietary_mentions",
+                    "id", "name", "kind", "district", "description", "tags", "hours", "price",
+                    "price_sources", "price_conflict", "source_url", "citation", "lat", "lon",
+                    "price_tier", "dietary_mentions",
                 ) if k in item})
             trimmed[tool_name][key] = rows
     return trimmed
@@ -171,8 +173,14 @@ def sanitize_itinerary(draft: dict, facts: dict, profile: dict, days: int, verif
             if isinstance(cost, (int, float)) and cost >= 0:
                 total += float(cost)
                 any_priced = True
+            note = cost_info.get("notes") if cost_info else \
+                "No usable price was listed; verify costs before travel."
+            if match.get("hours_unverified"):
+                note += " Opening hours could not be verified; confirm them before visiting."
             activities.append({
                 "name": match["name"],
+                "category": category_label(match),
+                "description": short_description(match, 220),
                 "start_time": start_time,
                 "end_time": end_time,
                 "estimated_cost": cost,
@@ -181,8 +189,7 @@ def sanitize_itinerary(draft: dict, facts: dict, profile: dict, days: int, verif
                 "lon": match.get("lon"),
                 "travel_from_previous_min": (travel or {}).get("duration_min"),
                 "route_source_url": (travel or {}).get("source_url"),
-                "notes": (cost_info.get("notes") if cost_info else
-                          "No usable price was listed; verify costs before travel.")[:400],
+                "notes": note[:400],
             })
             last_end = end_time
         if activities:
@@ -271,8 +278,12 @@ def relocate_displaced(kept_days: list[dict], displaced: list[dict],
             total += float(cost)
             any_priced = True
         note = cost_info.get("notes") if cost_info else "No usable price was listed; verify costs before travel."
+        if match.get("hours_unverified"):
+            note += " Opening hours could not be verified; confirm them before visiting."
         entry = {
             "name": match["name"],
+            "category": category_label(match),
+            "description": short_description(match, 220),
             "start_time": f"{start_min // 60:02d}:{start_min % 60:02d}",
             "end_time": f"{end_min // 60:02d}:{end_min % 60:02d}",
             "estimated_cost": cost,
@@ -346,11 +357,9 @@ async def verify_selected_hours(session, facts: dict, draft: dict, city: str,
         for day in plan_days(draft)
         for activity in plan_activities(day)
     }
-    unavailable = set()
     for name in names:
         item = places.get(name)
         if not item:
-            unavailable.add(name)
             continue
         try:
             result = await call_tool(session, "get_opening_hours", {
@@ -361,14 +370,12 @@ async def verify_selected_hours(session, facts: dict, draft: dict, city: str,
                 item["source_url"] = item.get("source_url") or result.get("source_url")
             else:
                 item["hours"] = None
+                item["hours_unverified"] = True
             calls.append(tool_call("get_opening_hours", True, "Researcher"))
         except Exception:
-            unavailable.add(name)
+            item["hours"] = None
+            item["hours_unverified"] = True
             calls.append(tool_call("get_opening_hours", False, "Researcher"))
-    if unavailable:
-        for tool_name, field in (("find_attractions", "attractions"), ("find_restaurants", "restaurants")):
-            rows = facts.get(tool_name, {}).get(field, [])
-            facts[tool_name][field] = [row for row in rows if row.get("name", "").casefold() not in unavailable]
 
 
 async def estimate_routes(session, draft: dict, city: str, calls: list[dict]) -> dict:

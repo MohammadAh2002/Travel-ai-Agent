@@ -9,12 +9,14 @@ from pathlib import Path
 from openai import APIConnectionError, APIStatusError, APITimeoutError
 
 from ..agents import (
-    advise_documents, advise_specialist, budget_summary, coordinate, draft_itinerary, research, verify_itinerary,
+    advise_documents, advise_specialist, answer_general, budget_summary, coordinate, draft_itinerary,
+    research, verify_itinerary,
 )
 from ..core.guardrails import inspect_input, safe_reply
 from ..core.models import ChatRequest
 from ..features.checklist import make_checklist
 from ..features.nearby import nearby_places
+from ..features.place_info import category_label, short_description
 from ..services import watches
 from ..services.mcp_client import call_tool, connection
 from ..services.memory import get_session, save_session
@@ -285,27 +287,61 @@ async def chat_flow(req: ChatRequest) -> dict:
                         agents.append({"name": "Route and Mobility Analyst", "status": "completed"})
                     except Exception:
                         agents.append({"name": "Route and Mobility Analyst", "status": "unavailable"})
-                check, usage = await verify_itinerary(proposed, facts, route_notes)
-                record_usage(usage)
-                agents.extend(specialist_status(usage.get("agents_run", [])))
-                if not check.get("approved") or len(proposed.get("days", [])) != days:
-                    reply = "I couldn't verify enough sourced activities to propose a reliable itinerary. Please adjust the request or try another date."
+                if not proposed.get("days"):
+                    found = [item["name"] for item in
+                             facts.get("find_attractions", {}).get("attractions", [])
+                             if item.get("name")][:5]
+                    reply = ("I couldn't build a schedule from the sourced listings this time — the "
+                             "places found were closed on those dates or had no reliable times. "
+                             + (f"Sourced places I can still work with: {', '.join(found)}. " if found else "")
+                             + "Want me to try different dates or a different destination?")
                     state.last_agents = agents
                     state.history.append({"role": "assistant", "content": reply})
                     save_session(state)
                     return response(reply, state=state.model_dump(), tool_calls=calls,
                                     citations=collect_sources(facts), usage=usage_summary())
+                try:
+                    check, usage = await verify_itinerary(proposed, facts, route_notes)
+                    record_usage(usage)
+                    agents.extend(specialist_status(usage.get("agents_run", [])))
+                except Exception:
+                    check = {"approved": False, "issues": [],
+                             "note": "the verification step was unavailable"}
+                    agents.append({"name": "Independent Itinerary Critic", "status": "unavailable"})
         except Exception as exc:
             reply = f"I couldn't access the trip research tools ({type(exc).__name__}). I won't make up travel facts."
             return response(reply, state=state.model_dump(), tool_calls=calls,
                             usage=usage_summary())
         state.itinerary = proposed
+        planned = len(proposed["days"])
+        caveats = []
+        if planned < days:
+            first = date.fromisoformat(state.profile.start_date)
+            filled = {day["date"] for day in proposed["days"]}
+            missing = [d for d in
+                       (first.fromordinal(first.toordinal() + i).isoformat() for i in range(days))
+                       if d not in filled]
+            caveats.append(f"I could verify sourced activities for {planned} of the {days} requested "
+                           f"day(s)" + (f"; nothing verified for {', '.join(missing)}." if missing else "."))
+        if not check.get("approved"):
+            issues = [str(issue) for issue in (check.get("issues") or [])][:3]
+            if not issues and check.get("note"):
+                issues = [str(check["note"])]
+            caveats.append("The verifier was not fully confident"
+                           + (": " + "; ".join(issues) + "." if issues else ".")
+                           + " Double-check details before relying on this plan.")
+        if facts.get("find_attractions", {}).get("interest_relaxed"):
+            caveats.append("Few listings matched your specific interests, so I widened the search to "
+                           "other popular sourced places.")
+        total_txt = (f"{proposed['estimated_total']} {proposed['currency']}"
+                     if proposed["estimated_total"] is not None else "unknown total")
         action_id = "act-" + uuid.uuid4().hex
         pending = {
             "action_id": action_id, "type": "save_trip",
-            "summary": f"Save {destination}, {days} day(s), estimated {proposed['estimated_total']} "
-                       f"{proposed['currency']} for {proposed['travellers']} traveller(s)",
-            "payload": {"traveller_id": state.profile.traveller_id, "title": f"{destination}, {days} day(s)",
+            "summary": f"Save {destination}, {planned} of {days} day(s) planned, estimated {total_txt} "
+                       f"for {proposed['travellers']} traveller(s)",
+            "payload": {"traveller_id": state.profile.traveller_id,
+                        "title": f"{destination}, {planned} day(s)",
                         "itinerary": proposed},
         }
         state.pending_action = pending
@@ -320,11 +356,17 @@ async def chat_flow(req: ChatRequest) -> dict:
                            if profile.get("saved_dietary") else "")
         day_lines = []
         for index, day in enumerate(proposed["days"], 1):
-            stops = ", ".join(f"{activity['start_time']} {activity['name']}" for activity in day["activities"])
+            stops = ", ".join(
+                f"{activity['start_time']} {activity['name']}"
+                + (f" ({activity['category']})" if activity.get("category") else "")
+                for activity in day["activities"])
             day_lines.append(f"Day {index} ({day['date']}): {stops}.")
-        reply = (f"Here is a sourced {days}-day plan for {destination}. Costs are estimates, and each listed "
-                 f"place links to its source.{preference_note}{budget_note} Review the itinerary and approve it only if it works "
-                 "for you. Saving stores a plan only; nothing is booked or purchased.\n\n" + "\n".join(day_lines))
+        plan_label = f"{days}-day" if planned == days else f"{planned}-day (of {days} requested)"
+        reply = (f"Here is a sourced {plan_label} plan for {destination}. Costs are estimates, and each listed "
+                 f"place links to its source.{preference_note}{budget_note}"
+                 + (" " + " ".join(caveats) if caveats else "")
+                 + " Review the itinerary and approve it only if it works for you. Saving stores a plan "
+                   "only; nothing is booked or purchased.\n\n" + "\n".join(day_lines))
         sources = (collect_sources(facts) + [citation for cost in verified_costs.values()
                                               for citation in cost.get("citations", []) if citation.get("url")] +
                    [route.get("citation") for route in route_estimates.values()
@@ -513,7 +555,11 @@ async def chat_flow(req: ChatRequest) -> dict:
                              "synthetic test data in this demo; treat all prices as estimates and confirm with the venue.")
                 else:
                     raw = (item.get("price") or {}).get("raw") or "No listed price"
-                    reply = f"{item['name']}: {raw}. This is an estimate from the linked listing, not a live quote."
+                    reply = (f"{item['name']} ({category_label(item)}): {raw}. "
+                             "This is an estimate from the linked listing, not a live quote.")
+                    blurb = short_description(item)
+                    if blurb:
+                        reply += f"\n{blurb}"
             agents.append({"name": "Researcher", "status": "completed"})
             sources = collect_sources(data)
         except Exception as exc:
@@ -589,13 +635,26 @@ async def chat_flow(req: ChatRequest) -> dict:
         save_session(state)
         return response(reply, state=state.model_dump(), pending=pending)
 
+    if intent in {"general", "off_topic"}:
+        agents.append({"name": "General Agent", "status": "working"})
+        try:
+            reply, usage, sources = await answer_general(req.message, state.history)
+            record_usage(usage)
+        except Exception:
+            reply = OFF_TOPIC_REPLY if intent == "off_topic" else GENERAL_FALLBACK
+            sources = []
+        agents[-1]["status"] = "completed"
+        state.last_agents = agents
+        state.last_sources = sources
+        state.history.append({"role": "assistant", "content": reply})
+        save_session(state)
+        return response(reply, state=state.model_dump(), citations=sources,
+                        usage=usage_summary())
+
     if intent == "checklist":
         items = make_checklist(state.profile.destination, profile, state.itinerary)
         reply = "Before you travel:\n" + "\n".join(f"- {item}" for item in items)
         agents.append({"name": "Travel Prep Advisor", "status": "completed"})
-    elif intent == "off_topic":
-        reply = OFF_TOPIC_REPLY
-        agents.append({"name": "Coordinator", "status": "completed"})
     else:
         reply = str(extracted.get("question") or GENERAL_FALLBACK)
         agents.append({"name": "Coordinator", "status": "completed"})

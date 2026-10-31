@@ -19,7 +19,8 @@ Return {intent, destination, target_place, start_date, end_date, days, adults, c
 lodging_style, walking_style, origin, gift_heavy, passport_nationality, minutes, preference_updates, question,
 assumption}. intent is one of itinerary, day_plan, documents, nearby, lodging, weather, route, checklist, general, revise, price, watch,
 remember, off_topic. Use off_topic for requests that are not about travel at all (coding, homework, news,
-jokes, general knowledge, or anything else outside trip planning) — Rihla answers only travel questions.
+jokes, general knowledge, or anything else outside trip planning) — these are handed to the
+web-backed general agent.
 For remember, preference_updates may use only dietary, interests, budget_style, walking_tolerance,
 max_walk_minutes, home_currency, travel_party, or notes. Include minutes when a nearby time radius is specified.
 Use null for unknowns, arrays for lists. For lodging questions, do not imply the system can search hotel inventory or rates.

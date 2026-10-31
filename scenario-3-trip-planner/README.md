@@ -7,7 +7,7 @@ Rihla is a travel-planning crew that asks what it needs, researches sourced acti
 ## What makes it useful
 
 - Conversational clarification for dates, budget, party size and children's ages, pace, interests and hotel use.
-- Ten focused CrewAI roles, routed only when relevant: Coordinator/Clarifier, Place Researcher, Lodging Advisor, Weather Analyst, Route & Mobility Analyst, Budget Analyst, Itinerary Planner, Revision Specialist, Documents Advisor and independent Itinerary Critic.
+- Eleven focused CrewAI roles, routed only when relevant: Coordinator/Clarifier, Place Researcher, Lodging Advisor, Weather Analyst, Route & Mobility Analyst, Budget Analyst, Itinerary Planner, Revision Specialist, Documents Advisor, independent Itinerary Critic and a web-backed General Knowledge Agent for anything outside the travel scope.
 - Sourced day plans with itinerary revisions, opening-day checks, converted listed ticket estimates and disclosed uncertainty.
 - Quick-start suggestion chips for trip preparation, official travel-document links, one-day planning, nearby places, trip plans and hourly watches — everything is done in chat.
 - Google Maps coordinate pins and supported Google Maps links for approximate nearby search.
@@ -70,7 +70,7 @@ The eval runner can write a scorecard with `--out evals/scorecard.md`. It calls 
 | Measure | Status |
 |---|---|
 | Kit API/MCP smoke test | Passed in this workspace |
-| Local unit tests | 18 passed |
+| Local unit tests | 23 passed |
 | Kit sample cases | Not run in this verification session |
 | Additional cases | Not run in this verification session |
 | Before/after fix | Before: an LLM draft could include unsupported place names or a listing-closed weekday. After: code keeps only MCP-returned places, replaces source URLs from those tool results, queries opening hours for selected stops, and filters closed-day/timing conflicts before the approval proposal. |

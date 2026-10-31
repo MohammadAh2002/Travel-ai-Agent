@@ -270,7 +270,8 @@ function itineraryCard(itinerary) {
         <div class="activity">
           <div class="activity-time">${escapeHTML(item.start_time || "")}</div>
           <div>
-            <div class="activity-name">${escapeHTML(item.name)}</div>
+            <div class="activity-name">${escapeHTML(item.name)}${item.category ? ` <span class="activity-cat">${escapeHTML(item.category)}</span>` : ""}</div>
+            ${item.description ? `<div class="activity-desc">${escapeHTML(item.description)}</div>` : ""}
             <div class="activity-meta">${item.estimated_cost == null ? "Price not listed" : `~${escapeHTML(item.estimated_cost)} ${escapeHTML(itinerary.currency)}`}${item.travel_from_previous_min ? ` · ${escapeHTML(item.travel_from_previous_min)} min walk` : ""}${item.source_url ? ` · <a href="${escapeHTML(item.source_url)}" target="_blank" rel="noopener noreferrer">source ↗</a>` : ""}</div>
           </div>
         </div>`).join("")}

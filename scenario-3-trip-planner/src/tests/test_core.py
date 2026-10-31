@@ -192,10 +192,11 @@ class ChatFlowTests(unittest.TestCase):
 
 
 class CrewTests(unittest.TestCase):
-    def test_ten_specialist_roles_are_registered(self):
-        self.assertEqual(len(ROLE_SPECS), 10)
+    def test_specialist_roles_are_registered(self):
+        self.assertEqual(len(ROLE_SPECS), 11)
         self.assertIn("lodging_advisor", ROLE_SPECS)
         self.assertIn("revision_specialist", ROLE_SPECS)
+        self.assertIn("general_agent", ROLE_SPECS)
 
     def test_run_crew_uses_only_requested_roles_and_validates_output(self):
         created_agents = []
@@ -280,6 +281,47 @@ class LodgingFlowTests(unittest.TestCase):
         self.assertIsNone(response["pending_action"])
         self.assertFalse(response["usage"]["cost_known"])
         self.assertEqual(response["usage"]["total_tokens"], 4)
+
+
+class GeneralAgentTests(unittest.TestCase):
+    def test_ddg_lite_parser_extracts_results(self):
+        from app.features.web_search import parse_ddg_lite
+
+        page = ('<a rel="nofollow" href="https://en.wikipedia.org/wiki/Galata_Tower" '
+                "class='result-link'>Galata Tower - Wikipedia</a>"
+                "<td class='result-snippet'><b>Galata</b> Tower is a tower in Istanbul.</td>")
+        results = parse_ddg_lite(page, 5)
+        self.assertEqual(results[0]["url"], "https://en.wikipedia.org/wiki/Galata_Tower")
+        self.assertEqual(results[0]["title"], "Galata Tower - Wikipedia")
+        self.assertIn("Istanbul", results[0]["snippet"])
+
+    def test_off_topic_question_is_answered_by_the_general_agent(self):
+        sources = [{"id": "web-1", "title": "Canberra - Wikipedia",
+                    "url": "https://en.wikipedia.org/wiki/Canberra"}]
+        with patch("app.chat.flow.coordinate", new=AsyncMock(
+                return_value=({"intent": "off_topic"}, {"cost_usd": None, "total_tokens": 1}))), \
+                patch("app.chat.flow.answer_general", new=AsyncMock(return_value=(
+                    "The capital of Australia is Canberra.", {"cost_usd": None, "total_tokens": 5},
+                    sources))):
+            response = asyncio.run(chat_flow(ChatRequest(
+                session_id="general-offtopic-test",
+                message="What is the capital of Australia?",
+            )))
+        self.assertIn("Canberra", response["reply"])
+        self.assertIsNone(response["pending_action"])
+        self.assertEqual(response["citations"], sources)
+        self.assertIn("General Agent", [a["name"] for a in response["agents"]])
+
+    def test_general_agent_falls_back_when_web_lookup_fails(self):
+        with patch("app.chat.flow.coordinate", new=AsyncMock(
+                return_value=({"intent": "general"}, {"cost_usd": None, "total_tokens": 1}))), \
+                patch("app.chat.flow.answer_general",
+                      new=AsyncMock(side_effect=RuntimeError("web down"))):
+            response = asyncio.run(chat_flow(ChatRequest(
+                session_id="general-fallback-test", message="Tell me something.")))
+        self.assertTrue(response["reply"])
+        self.assertIsNone(response["pending_action"])
+        self.assertIsNone(response["result"])
 
 
 class SpecialistRoutingTests(unittest.TestCase):

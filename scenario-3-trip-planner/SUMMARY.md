@@ -48,7 +48,7 @@ scenario-3-trip-planner/
 │   │   │   └── guardrails.py  # input screening and output link stripping
 │   │   ├── data/travel_docs.json  # official-government document source directory
 │   │   └── static/            # index.html, app.js, style.css — no-build browser UI
-│   ├── tests/test_core.py     # 18 unit tests
+│   ├── tests/test_core.py     # 23 unit tests
 │   └── evals/cases.extra.jsonl# our extra eval scenarios
 │
 └── kit/                   # PROVIDED FILES — unchanged
@@ -81,9 +81,10 @@ its `.md` file — no Python change needed.
    object: `intent` plus every trip detail it could extract. Intents: `itinerary`, `day_plan`, `revise`,
    `documents`, `nearby`, `lodging`, `weather`, `route`, `checklist`, `price`, `watch`, `remember`,
    `general`, and `off_topic`.
-5. **Off-topic** — for `off_topic` the app sends a fixed reply (no LLM call): *"I'm Rihla, an AI
-   travel-planning assistant — that's the one job I do. I can help with: …"* listing the real
-   capabilities, then asks what the traveller wants to plan.
+5. **General / off-topic** — `general` and `off_topic` intents go to the General Knowledge Agent
+   (`general_agent`), which answers any question using live web-search results (DuckDuckGo) gathered
+   in code, then cites the sources it used. If the web lookup or the crew call fails, the app falls
+   back to a fixed capability reply.
 6. **Clarify first** — for itinerary intents, `missing_trip_info` checks the essentials (destination,
    dates/days, budget, party size, children's ages). Anything missing → one focused question back, and
    the turn ends.
@@ -132,7 +133,7 @@ this demo); only approved trips and preferences survive, because they live in th
 - Preference memory (diet, interests, walking limits) — saved only after approval.
 - Hourly weather/currency watches with honest scope (no hotel/flight feeds exist).
 - Voice input via local faster-whisper; guardrails against injection and over-length input.
-- Off-topic requests get a clear "I'm a travel-planning assistant, here's what I can do" reply.
+- A web-backed general agent answers questions outside the travel scope, citing live search results.
 
 ## How it was built (and how to change it)
 
@@ -153,7 +154,7 @@ this demo); only approved trips and preferences survive, because they live in th
 3. Or locally (Python 3.12, `pip install -r src/requirements.txt`; the kit's `.venv` already has everything):
    - gateway: `cd kit && uvicorn services.travel_api:app --port 8103`
    - app: `cd src && uvicorn app.main:app --port 8000`
-4. Verify: `cd src && python -m unittest tests.test_core` (18 unit tests),
+4. Verify: `cd src && python -m unittest tests.test_core` (23 unit tests),
    `python kit/check_kit.py` (kit smoke test), `python kit/evals/run_evals.py` (API-level cases;
    our extra scenarios are in `src/evals/cases.extra.jsonl`).
 

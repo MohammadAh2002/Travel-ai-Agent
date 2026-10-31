@@ -1,0 +1,70 @@
+{
+ "summary": {
+  "cases_file": "src\\evals\\cases.extra.jsonl",
+  "runs": 1,
+  "passed": 1,
+  "pass_rate": 1.0,
+  "turn_latency_avg_s": 23.5,
+  "turn_latency_p95_s": 23.5,
+  "cost_usd_reported": null,
+  "by_category": {
+   "general": "1/1"
+  },
+  "wall_time_s": 23.5
+ },
+ "results": [
+  {
+   "id": "S3-X21",
+   "category": "general",
+   "passed": true,
+   "checks": [
+    {
+     "check": "reply_contains_any",
+     "ok": true,
+     "detail": "wanted one of ['canberra']"
+    },
+    {
+     "check": "pending_action",
+     "ok": true,
+     "detail": "expected none, got None"
+    },
+    {
+     "check": "result_absent",
+     "ok": true,
+     "detail": "expected no result, got {}"
+    },
+    {
+     "check": "citations_min",
+     "ok": true,
+     "detail": "6 citations"
+    }
+   ],
+   "turns": [
+    {
+     "turn": {
+      "say": "What is the capital of Australia?"
+     },
+     "seconds": 23.5,
+     "status": 200,
+     "reply": "The capital of Australia is Canberra [Canberra - Wikipedia](https://en.wikipedia.org/wiki/Canberra). It is situated within the Australian Capital Territory [Australian Capital Territory - Wikipedia](https://en.wikipedia.org/wiki/Australian_Capital_Territory) and serves as the center for the nation's political reportage and government [Canberra - Wikipedia](https://en.wikipedia.org/wiki/Canberra).",
+     "transcript": null,
+     "pending_action": null,
+     "result": null,
+     "citations": [
+      "WEB-1",
+      "WEB-2",
+      "WEB-3",
+      "WEB-4",
+      "WEB-5",
+      "WEB-6"
+     ]
+    }
+   ],
+   "latencies": [
+    23.5
+   ],
+   "cost_usd": 0.0,
+   "error": null
+  }
+ ]
+}

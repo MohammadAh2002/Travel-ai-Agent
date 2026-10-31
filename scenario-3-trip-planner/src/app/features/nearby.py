@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from .map_tools import haversine_km, place_from_map_link, resolve_map_link
+from .place_info import category_label, short_description
 from ..services.mcp_client import call_tool
 
 
@@ -60,7 +61,9 @@ async def nearby_places(session, text: str, minutes: int = 15) -> tuple[str, lis
                 walk_minutes = round(distance / 4.2 * 60)
                 if walk_minutes <= max(1, min(minutes, 120)):
                     results.append({**place, "distance_km": round(distance, 2),
-                                    "walk_minutes_estimate": walk_minutes})
+                                    "walk_minutes_estimate": walk_minutes,
+                                    "category": category_label(place),
+                                    "blurb": short_description(place)})
         except Exception:
             calls.append({"tool": name, "ok": False, "agent": "Nearby Guide"})
     results.sort(key=lambda row: row["walk_minutes_estimate"])
@@ -69,6 +72,9 @@ async def nearby_places(session, text: str, minutes: int = 15) -> tuple[str, lis
                 f"{city} data. Walking times are straight-line estimates, not routed directions."), [], calls
     lines = [f"Near your pin in {city} (straight-line walking-time estimates; check a live map for actual routes):"]
     for place in results[:8]:
-        lines.append(f"- **{place['name']}** — about {place['walk_minutes_estimate']} min / "
-                     f"{place['distance_km']} km; [source]({place.get('source_url')})")
+        lines.append(f"- **{place['name']}** — {place['category']} · about "
+                     f"{place['walk_minutes_estimate']} min / {place['distance_km']} km; "
+                     f"[source]({place.get('source_url')})")
+        if place.get("blurb"):
+            lines.append(f"  {place['blurb']}")
     return "\n".join(lines), results, calls
