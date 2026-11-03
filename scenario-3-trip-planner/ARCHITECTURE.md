@@ -51,7 +51,7 @@ All application code lives under `src/`; `kit/` holds only the provided services
 - `src/app/agents/skills/<role>.md`: one skill file per CrewAI role — role/goal/backstory plus the standing instructions prepended to that role's tasks.
 - `src/app/agents/`: request-specific CrewAI roles plus the MCP researcher and deterministic budget helpers.
 - `src/app/services/mcp_client.py`: MCP stdio client for the provided travel gateway (locates `kit/services/` automatically).
-- `src/app/services/memory.py`, `src/app/core/models.py`: typed session/profile state and expiring in-memory sessions.
+- `src/app/services/memory.py`, `src/app/core/models.py`: typed session/profile state and expiring SQLite-backed sessions.
 - `src/app/core/guardrails.py`: input screening and safe output handling.
 - `src/app/features/map_tools.py`, `src/app/features/nearby.py`: Google Maps coordinates/links and approximate nearby matching.
 - `src/app/features/checklist.py`, `src/app/services/watches.py`, `src/app/features/voice.py`: preparation, scheduled checks and transcription.

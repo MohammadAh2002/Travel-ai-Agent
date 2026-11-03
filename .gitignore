@@ -61,6 +61,8 @@ cover/
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
+scenario-3-trip-planner/data/sessions.sqlite3*
+scenario-3-trip-planner/data/preferences.sqlite3*
 
 # Flask stuff:
 instance/
