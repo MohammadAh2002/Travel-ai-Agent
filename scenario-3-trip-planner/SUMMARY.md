@@ -111,15 +111,16 @@ its `.md` file — no Python change needed.
 
 | What | Where | Lifetime |
 |---|---|---|
-| **User sessions** | `src/app/services/memory.py` — a module-level Python `dict` (`SESSIONS`) inside the app process. Each entry is a `SessionState` (profile, history, itinerary, pending action) keyed by `session_id`, refreshed on every message and expired after `SESSION_TTL_SECONDS` (default 86 400 s = 24 h). | Until app restart or TTL expiry — **in memory only, nothing on disk**. |
+| **User sessions** | `src/app/services/memory.py` stores serialized `SessionState` records in `data/sessions.sqlite3` (override with `SESSION_DB_PATH`). Activity refreshes the timestamp; `SESSION_TTL_SECONDS` defaults to 86 400 s (24 h). | Survives app restart; expires after the inactivity TTL. |
 | **Session ID itself** | Created by the browser (`web-<uuid>`) in `src/app/static/app.js`, sent with every request. | Per conversation in the browser. |
 | **Chat list UI** | `localStorage["rihla.conversations.v1"]` — the sidebar history you see is purely a browser-side cache for display. | Until the user clears browser storage; independent of server state. |
-| **Approved trips** | The simulated Trip Store, written only via MCP `save_trip` by `/api/approve` code — never by the LLM. | Durable inside the travel gateway (inspectable via its `/admin/trips`). |
-| **Saved preferences** | Same Trip Store, via MCP `save_preferences` after the same explicit approval. | Durable; read back as `get_preferences` for known `traveller_id`s. |
+| **Approved trips** | The simulated Trip Store, written only via MCP `save_trip` by `/api/approve` code — never by the LLM. | In-process inside the travel gateway; cleared on gateway restart/reset. |
+| **Saved preferences** | Gateway SQLite database `data/preferences.sqlite3` (`PREFERENCES_DB_PATH` override), via MCP `save_preferences` after explicit approval. | Survives gateway restart; test-only `/admin/reset` restores seed data. |
 | **Watches** | `src/app/services/watches.py` module-level `WATCHES` dict (max 10 per session), refreshed by a background asyncio loop every `WATCH_INTERVAL_SECONDS` (default 3 600 s). | In-process; cleared on restart. |
 
-Practical takeaway: restarting the app wipes sessions and watches (state is in-process by design for
-this demo); only approved trips and preferences survive, because they live in the Trip Store behind MCP.
+Practical takeaway: sessions survive app restarts in SQLite until their inactivity TTL expires.
+Watches clear on app restart. Preferences survive gateway restart in SQLite; `/admin/reset` clears them.
+Approved trips remain in gateway process memory and are lost on gateway restart/reset.
 
 ## Features
 

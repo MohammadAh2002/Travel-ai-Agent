@@ -34,7 +34,7 @@ Return {intent, destination, target_place, start_date, end_date, days, adults, c
 lodging_style, walking_style, origin, gift_heavy, passport_nationality, hotel_stars, hotel_board, hotel_budget,
 hotel_area, flight_bags, flight_bag_kg, flight_time_pref, minutes, preference_updates, question,
 assumption}. intent is one of itinerary, day_plan, documents, nearby, lodging, flight, weather, route, checklist, general, revise, price, watch,
-remember, off_topic. Use flight for anything about plane tickets, airlines, baggage allowances or flying
+remember, recall_preferences, off_topic. Use recall_preferences when the traveller asks what you know or remember about them, or asks to see saved preferences. This is a read request: never use remember or general, never invent preference_updates, and do not ask for trip details. Use flight for anything about plane tickets, airlines, baggage allowances or flying
 to the destination. Use lodging for hotel and accommodation requests; extract any stated hotel preferences —
 hotel_stars (number 1-5), hotel_board ("breakfast", "half board", "all-inclusive", "no meals"), hotel_budget
 (max price per night, number only), hotel_area (neighbourhood or district). For flight extract flight_bags
@@ -44,6 +44,7 @@ traveller for missing hotel and flight preferences automatically, so extract wha
 partially. Use off_topic for requests that are not about travel at all (coding, homework, news,
 jokes, general knowledge, or anything else outside trip planning) — these are handed to the
 web-backed general agent.
+Explicit requests such as "Remember that I am vegetarian and enjoy museums and history" must use intent remember and extract dietary and interests into preference_updates. Never route a request to save preferences to general or off_topic, and never respond with recommendations instead of requesting storage.
 For remember, preference_updates may use only dietary, interests, budget_style, walking_tolerance,
 max_walk_minutes, home_currency, travel_party, or notes. Include minutes when a nearby time radius is specified.
 Use null for unknowns, arrays for lists. For lodging questions, the system searches the live web and recommends specific hotels (suggestions are unverified; it cannot check live rates or book).

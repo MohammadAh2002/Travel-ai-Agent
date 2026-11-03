@@ -3,7 +3,7 @@
 Rihla is a fictional travel start-up. This service gives your agents:
   read side   real open travel data (Wikivoyage, OpenStreetMap/Nominatim, Open-Meteo, Frankfurter,
               FOSSGIS OSRM) behind a record/replay cache, so demos and tests are reproducible
-  write side  a simulated Trip Store and traveller preferences (in memory, seeded from services/data)
+  write side  an in-memory simulated Trip Store and SQLite traveller preferences, seeded from services/data
 
 Run:   uvicorn services.travel_api:app --port 8103
 Docs:  http://localhost:8103/docs
@@ -28,6 +28,7 @@ from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from . import travel_data as td
+from . import preference_store
 
 SERVICE = "rihla-travel-api"
 DATA_DIR = Path(__file__).resolve().parent / "data"
@@ -59,12 +60,13 @@ def env_overlays() -> list[str]:
     return [n.strip() for n in os.getenv("TRAVEL_OVERLAYS", "").split(",") if n.strip()]
 
 
-def reset_state() -> None:
+def reset_state(*, reset_preferences: bool = False) -> None:
     travellers = json.loads((DATA_DIR / "travellers.json").read_text(encoding="utf-8"))
     trips = json.loads((DATA_DIR / "trips.json").read_text(encoding="utf-8"))
+    preference_store.initialize(travellers, reset=reset_preferences)
     with LOCK:
         STATE.clear()
-        STATE.update(travellers={t["traveller_id"]: t for t in travellers}, trips=trips,
+        STATE.update(trips=trips,
                      next_trip=3001 + len(trips), idempotency={}, overlays=td.load_overlays(env_overlays()))
         FAULTS.clear()
         LOG.clear()
@@ -477,7 +479,7 @@ def list_trips(traveller_id: str):
 
 
 def traveller(traveller_id: str) -> dict | None:
-    return next((t for k, t in STATE["travellers"].items() if k.lower() == traveller_id.lower()), None)
+    return preference_store.get(traveller_id)
 
 
 @app.get("/api/travellers/{traveller_id}/preferences", dependencies=[Depends(require_key)])
@@ -509,20 +511,13 @@ def save_preferences(traveller_id: str, body: dict = Body(..., examples=[{"dieta
         raise ApiError(422, "bad_value", "budget_style must be budget, mid-range or splurge.")
     if "walking_tolerance" in prefs and prefs["walking_tolerance"] not in ("low", "medium", "high"):
         raise ApiError(422, "bad_value", "walking_tolerance must be low, medium or high.")
-    with LOCK:
-        t = traveller(traveller_id)
-        if not t:
-            t = {"traveller_id": traveller_id, "name": None, "preferences": {}, "updated_at": None}
-            STATE["travellers"][traveller_id] = t
-        t["preferences"].update(prefs)
-        t["updated_at"] = td.now_iso()
-        return copy.deepcopy(t)
+    return preference_store.save(traveller_id, prefs, td.now_iso())
 
 
 # ------------------------------------------------------------------ TEST-ONLY admin endpoints (no API key)
 @app.post("/admin/reset", tags=["admin (test-only)"])
 def admin_reset():
-    reset_state()
+    reset_state(reset_preferences=True)
     return {"status": "reset", "overlays": overlays()["names"], "trips": 0}
 
 
@@ -564,7 +559,7 @@ def admin_trips():
 
 @app.get("/admin/travellers", tags=["admin (test-only)"])
 def admin_travellers():
-    return {"travellers": copy.deepcopy(list(STATE["travellers"].values()))}
+    return {"travellers": preference_store.list_travellers()}
 
 
 @app.get("/admin/overlays", tags=["admin (test-only)"])

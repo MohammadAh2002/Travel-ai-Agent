@@ -47,6 +47,13 @@ GENERAL_FALLBACK = ("I can help plan an itinerary, find nearby places, check tra
                     "or prepare a pre-trip checklist. What would you like to do?")
 
 
+def _preferences_not_found(exc: BaseException) -> bool:
+    # MCP's async task groups wrap tool errors, sometimes more than once.
+    if isinstance(exc, BaseExceptionGroup):
+        return all(_preferences_not_found(child) for child in exc.exceptions)
+    return isinstance(exc, RuntimeError) and str(exc).startswith("traveller_not_found:")
+
+
 def update_profile(profile, extracted: dict, merge_interests: bool = False) -> None:
     scalar = ("destination", "start_date", "end_date", "adults", "children_count", "budget", "currency",
               "lodging_style", "walking_style", "origin", "gift_heavy", "passport_nationality",
@@ -173,8 +180,20 @@ async def chat_flow(req: ChatRequest) -> dict:
             "total_tokens": total_tokens,
         }
 
+    # Common memory questions should work without an LLM or web search.
+    memory_question = bool(re.fullmatch(
+        r"(?:what (?:do you know|do you remember|have you saved) about me|"
+        r"(?:show|list)(?: me)? my (?:saved |travel )?preferences|"
+        r"what are my (?:saved |travel )?preferences|"
+        r"(?:شو|ماذا|ايش|إيش) (?:بتعرف|بتتذكر|بتتذكره|تعرف|تتذكر) عني|"
+        r"(?:اعرض|ورجيني) تفضيلاتي(?: المحفوظة)?)",
+        req.message.strip().rstrip("?؟!. ").lower(),
+    ))
     try:
-        extracted, usage = await coordinate(req.message, state.profile, state.history[:-1])
+        if memory_question:
+            extracted, usage = {"intent": "recall_preferences"}, {"cost_usd": 0}
+        else:
+            extracted, usage = await coordinate(req.message, state.profile, state.history[:-1])
         record_usage(usage)
         agents.append({"name": "Coordinator", "status": "completed"})
     except Exception as exc:
@@ -194,6 +213,35 @@ async def chat_flow(req: ChatRequest) -> dict:
             reply = str(exc) if isinstance(exc, RuntimeError) else "I couldn't reach the planning model. Please try again."
         return response(reply, state=state.model_dump(), usage=usage_summary())
     intent = extracted.get("intent") or "general"
+    if intent == "recall_preferences":
+        saved = {}
+        failed = False
+        if state.profile.traveller_id != "TRV-GUEST":
+            try:
+                async with connection() as mcp:
+                    result = await call_tool(mcp, "get_preferences", {"traveller_id": state.profile.traveller_id})
+                saved = result.get("preferences", {})
+                calls.append(tool_call("get_preferences", True, "Preference Memory"))
+            except Exception as exc:
+                failed = not _preferences_not_found(exc)
+                calls.append(tool_call("get_preferences", not failed, "Preference Memory"))
+        if failed:
+            reply = "I couldn't load your saved preferences right now. Please try again."
+        elif saved:
+            labels = {"dietary": "Dietary preferences", "interests": "Interests",
+                      "budget_style": "Budget style", "walking_tolerance": "Walking tolerance",
+                      "max_walk_minutes": "Maximum walking minutes", "home_currency": "Home currency",
+                      "travel_party": "Travel party", "notes": "Notes"}
+            rows = [f"- {labels.get(key, key)}: {', '.join(map(str, value)) if isinstance(value, list) else value}"
+                    for key, value in saved.items()]
+            reply = "Here are your saved travel preferences:\n" + "\n".join(rows)
+        else:
+            reply = "You don't have any saved travel preferences yet. Tell me what to remember, then approve saving it."
+        state.history.append({"role": "assistant", "content": reply})
+        state.last_agents = [{"name": "Preference Memory", "status": "failed" if failed else "completed"}]
+        state.last_sources = []
+        save_session(state)
+        return response(reply, state=state.model_dump(), tool_calls=calls, usage=usage_summary())
     update_profile(state.profile, extracted, merge_interests=(intent == "revise"))
     profile = state.profile.model_dump()
 

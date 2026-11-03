@@ -1,4 +1,25 @@
 const STORAGE_KEY = "rihla.conversations.v1";
+const TRAVELLER_STORAGE_KEY = "rihla.traveller.v1";
+const travellerId = loadTravellerId();
+
+function loadTravellerId() {
+  try {
+    const saved = localStorage.getItem(TRAVELLER_STORAGE_KEY);
+    if (/^TRV-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(saved || "")) {
+      return saved;
+    }
+  } catch {
+    // If storage is unavailable, retain one identity for this page's lifetime.
+  }
+  const id = `TRV-${crypto.randomUUID()}`;
+  try {
+    localStorage.setItem(TRAVELLER_STORAGE_KEY, id);
+  } catch {
+    // Requests can still use the generated identity without persistent storage.
+  }
+  return id;
+}
+
 const state = { session: null, pending: null, pendingCard: null, maps: [], guidedFlow: null };
 const thread = document.querySelector("#chat-thread");
 const form = document.querySelector("#chat-form");
@@ -407,7 +428,7 @@ async function sendMessage(text, requestText = text, echo = true) {
   try {
     const response = await fetch("/api/chat", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ session_id: sessionId, message: requestText }),
+      body: JSON.stringify({ session_id: sessionId, message: requestText, user: { traveller_id: travellerId } }),
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.detail || "The travel assistant returned an error.");
@@ -507,6 +528,7 @@ mic.addEventListener("click", async () => {
       const audio = new Blob(chunks, { type: recorder.mimeType || "audio/webm" });
       const body = new FormData();
       body.append("session_id", state.session);
+      body.append("traveller_id", travellerId);
       body.append("audio", audio, "voice.webm");
       try {
         const response = await fetch("/api/voice", { method: "POST", body });

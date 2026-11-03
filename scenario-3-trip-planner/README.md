@@ -143,7 +143,8 @@ See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the full request flow, and [`SUMMAR
 - Visa and entry rules depend on passport nationality, trip purpose, transit and travel dates. The advisor is informational, not legal advice; confirm uncertain cases with the relevant embassy or consulate.
 - Watches can check the gateway's weather/FX data. No hotel or flight pricing feed exists.
 - The Lodging Advisor recommends specific hotels using live web-search results (with source links); when results are thin it may also name well-known hotels in the requested area from the model's knowledge. All suggestions are marked unverified — it never invents prices, ratings or amenities, and cannot check live rates, availability, or book hotels — no hotel inventory API exists.
-- Session state and watches live in process memory and clear on restart. Production deployment should use durable storage and a managed scheduler.
+- Session state is saved in `data/sessions.sqlite3` and survives app restarts. Set `SESSION_DB_PATH` to change the database location. Sessions still expire after `SESSION_TTL_SECONDS` of inactivity (default 24 hours). Watches remain in process memory and clear on restart; production deployment should use a managed scheduler.
+- Approved traveller preferences are saved by the travel gateway in `data/preferences.sqlite3` (override with `PREFERENCES_DB_PATH`) and survive gateway restarts. The test-only `/admin/reset` endpoint deliberately clears them and restores seed travellers. Trips remain in gateway process memory.
 - Voice requires microphone permission and a compatible faster-whisper install; normal text chat still works without voice.
 
 ## Attribution

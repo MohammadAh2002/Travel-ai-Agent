@@ -13,7 +13,7 @@ from app.chat.flow import chat_flow, missing_trip_info
 from app.chat.itinerary import fill_empty_days, price_conflict_notes, sanitize_itinerary
 from app.features.map_tools import coordinates_from_text, place_from_map_link
 from app.core.models import ChatRequest, TravelerProfile
-from app.services.memory import get_session
+from app.services.memory import get_session, save_session
 
 
 class GuardrailTests(unittest.TestCase):
@@ -303,6 +303,7 @@ class ChatFlowTests(unittest.TestCase):
         state.itinerary = {"days": [{"date": "2026-11-05", "activities": [{"name": "Hagia Sophia"}]}]}
         state.history = [{"role": "user",
                           "content": "add me activit ike riding ship and telfrici"}]
+        save_session(state)
         extracted = {
             "intent": "revise", "destination": "Istanbul", "start_date": "2026-11-05",
             "end_date": "2026-11-06", "days": 2, "adults": 3, "children_count": 0,
@@ -382,6 +383,7 @@ class ChatFlowTests(unittest.TestCase):
         state.itinerary = {"days": [{"date": "2026-11-05", "activities": [{"name": "Hagia Sophia"}]}]}
         state.history = [{"role": "user",
                           "content": "one day for sky diving or diving in see and telfrici"}]
+        save_session(state)
         extracted = {
             "intent": "revise", "destination": "Istanbul", "start_date": "2026-11-05",
             "end_date": "2026-11-06", "days": 2, "adults": 2, "children_count": 1,
@@ -431,6 +433,7 @@ class ChatFlowTests(unittest.TestCase):
     def test_unverifiable_revision_day_is_filled_not_dropped(self):
         state = get_session("revise-fill-day-test")
         state.itinerary = {"days": [{"date": "2026-11-05", "activities": [{"name": "Hagia Sophia"}]}]}
+        save_session(state)
         extracted = {
             "intent": "revise", "destination": "Istanbul", "start_date": "2026-11-05",
             "end_date": "2026-11-07", "days": 3, "adults": 2, "children_count": 1,

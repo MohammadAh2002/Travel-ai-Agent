@@ -31,6 +31,10 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
 TRAVEL_API_URL = os.getenv("TRAVEL_API_URL", "http://localhost:8103").rstrip("/")
 TRAVEL_API_KEY = os.getenv("TRAVEL_API_KEY", "dev-key-change-me")
 SESSION_TTL_SECONDS = int(os.getenv("SESSION_TTL_SECONDS", "86400"))
+SESSION_DB_PATH = Path(os.getenv(
+    "SESSION_DB_PATH",
+    str(Path(__file__).resolve().parents[3] / "data" / "sessions.sqlite3"),
+)).expanduser()
 WATCH_INTERVAL_SECONDS = max(60, int(os.getenv("WATCH_INTERVAL_SECONDS", "3600")))
 VOICE_MODEL = os.getenv("VOICE_MODEL", "tiny")
 VOICE_LANGUAGE = os.getenv("VOICE_LANGUAGE", "en").strip().lower()
